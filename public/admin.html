@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de administración | FerroMax</title>
+  <meta name="description" content="Panel de administración de catálogo, stock, precios y fotos de FerroMax.">
+  <meta name="theme-color" content="#ff9100">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="admin" class="admin-page">
+
+<svg class="svg-sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.5-8 9-4.8-1.5-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 15v5h16v-5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/><path d="M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14 6l4 4"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><circle cx="8.5" cy="9" r="1.5"/><path d="m4 18 5-5 3 3 3-4 5 6"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+  <symbol id="i-restore" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H4v16h6"/><path d="M14 8l4 4-4 4M8 12h10"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20z"/><path d="M12 9v5M12 17.5v.5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12"/><path d="M8 8V5h8v3M2 13h20M9 13v3h6v-3"/></symbol>
+  <symbol id="i-drill" viewBox="0 0 24 24"><path d="M2 7h9v7H2z"/><path d="M11 9h4v3h-4"/><path d="M15 8h3v5h-3"/><path d="M18 10.5h4"/><path d="M5 14v5h3v-5"/><path d="M6 7V4h4v3"/></symbol>
+  <symbol id="i-grinder" viewBox="0 0 24 24"><path d="M2 8h9v6H2z"/><path d="M11 10h4v2h-4"/><path d="M15 9h5v4h-5"/><circle cx="8" cy="17" r="3"/><path d="M5 17h6"/></symbol>
+  <symbol id="i-driver" viewBox="0 0 24 24"><path d="M3 8h8v6H3z"/><path d="M11 10h4v2h-4"/><path d="M15 9h3v4h-3"/><path d="M18 11h4M18.5 9.5 20 11l-1.5 1.5"/><path d="M5 14v5h3v-5"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></symbol>
+  <symbol id="i-screw" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><path d="M10.5 7.5 9.5 20h5l-1-12.5"/><path d="M10.5 11h3M10.2 14.5h3.6M9.8 18h4.4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10"/><path d="M22 10v4M6 12h4M8 10v4M14 12h3"/></symbol>
+  <symbol id="i-spray" viewBox="0 0 24 24"><path d="M9 8h6v13H9z"/><path d="M10 8V5h4v3"/><path d="M15 6h3M15 9h2M15 12h3M10 12h4"/></symbol>
+  <symbol id="i-level" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="6"/><path d="M7 9v6M17 9v6"/><circle cx="12" cy="12" r="1.5"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13C12 9 9 7 5 7c0 4 3 7 7 6z"/><path d="M12 13c0-4 3-6 7-6 0 4-3 7-7 6z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-roller" viewBox="0 0 24 24"><rect x="3" y="4" width="13" height="6"/><path d="M16 7h3v5h-8v3"/><rect x="9.5" y="15" width="3" height="6"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="i-hose" viewBox="0 0 24 24"><path d="M4 6h8a3 3 0 1 1 0 6H8a3 3 0 1 0 0 6h10"/><path d="M18 15v6"/></symbol>
+</svg>
+
+<header class="admin-header">
+  <div class="container admin-header__inner">
+    <a class="logo" href="index.html" aria-label="FerroMax, inicio">FERRO<span>MAX</span></a>
+    <div class="admin-crumb" aria-label="Ubicación">
+      <span>Panel</span>
+      <span aria-hidden="true">/</span>
+      <strong>Catálogo</strong>
+    </div>
+    <div class="admin-header__actions">
+      <span class="admin-mode" id="admin-mode">Demo local</span>
+      <a class="admin-header__link" href="index.html">Ver tienda</a>
+      <span class="admin-header__user" id="admin-user" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        <span id="admin-user-name"></span>
+      </span>
+      <button class="admin-header__link" id="admin-signout" type="button" hidden>Salir</button>
+    </div>
+  </div>
+</header>
+
+<main class="admin-main" id="contenido">
+  <div class="container">
+
+    <div class="admin-gate" id="admin-loading" aria-live="polite">
+      <p class="admin-gate__kicker">Panel / Cargando</p>
+      <h1 class="admin-gate__title">Verificando permisos</h1>
+      <p class="admin-gate__text">Un segundo mientras conectamos con el catálogo.</p>
+      <span class="admin-progress" aria-hidden="true"></span>
+    </div>
+
+    <div class="admin-gate" id="admin-gate" hidden>
+      <span class="admin-gate__icon" aria-hidden="true">
+        <svg class="icon"><use href="#i-shield"></use></svg>
+      </span>
+      <p class="admin-gate__kicker" id="gate-kicker">Acceso restringido</p>
+      <h1 class="admin-gate__title" id="gate-title">Necesitás iniciar sesión</h1>
+      <p class="admin-gate__text" id="gate-text">El panel solo está disponible para la cuenta administradora.</p>
+      <div class="admin-gate__actions">
+        <a class="btn btn--accent" href="cuenta.html#ingresar" id="gate-login">Iniciar sesión</a>
+        <button class="btn" id="gate-demo-login" type="button" hidden>Entrar como admin demo</button>
+        <a class="btn" href="index.html">Volver a la tienda</a>
+      </div>
+      <p class="admin-gate__note" id="gate-note"></p>
+    </div>
+
+    <div id="admin-shell" hidden>
+      <section class="admin-hero" aria-labelledby="admin-title">
+        <div>
+          <p class="admin-hero__kicker">Administración / Catálogo</p>
+          <h1 class="admin-hero__title" id="admin-title">Stock, precios<br>y fotos.</h1>
+          <p class="admin-hero__text">Los cambios se publican en el catálogo. Ocultá un producto para retirarlo de la tienda sin perder sus datos.</p>
+        </div>
+        <div class="admin-hero__meta">
+          <span class="admin-hero__date" id="admin-date"></span>
+          <span class="admin-hero__mode" id="admin-mode-detail">Demo local</span>
+          <a class="btn btn--accent" href="index.html" target="_blank" rel="noopener">Ver catálogo</a>
+        </div>
+      </section>
+
+      <div class="admin-alert" id="admin-alert" role="alert" hidden></div>
+
+      <div class="admin-local-note" id="admin-local-note" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+        <div>
+          <strong>Estás en el modo local de la demo.</strong>
+          <p>Los productos, precios y fotos quedan guardados en este navegador. No modifican el sitio publicado. Usá “Restaurar demo” para volver a los 32 productos originales.</p>
+        </div>
+      </div>
+
+      <section class="admin-stats" aria-label="Resumen del catálogo">
+        <article class="stat">
+          <span class="stat__index">01</span>
+          <p class="stat__label">Productos</p>
+          <strong class="stat__value" id="stat-total">—</strong>
+          <span class="stat__meta" id="stat-total-meta">en el catálogo</span>
+        </article>
+        <article class="stat">
+          <span class="stat__index">02</span>
+          <p class="stat__label">Publicados</p>
+          <strong class="stat__value" id="stat-published">—</strong>
+          <span class="stat__meta">visibles en la tienda</span>
+        </article>
+        <article class="stat">
+          <span class="stat__index">03</span>
+          <p class="stat__label">Sin stock</p>
+          <strong class="stat__value stat__value--warn" id="stat-out">—</strong>
+          <span class="stat__meta">agotados</span>
+        </article>
+        <article class="stat">
+          <span class="stat__index">04</span>
+          <p class="stat__label">Fotos</p>
+          <strong class="stat__value" id="stat-photos">—</strong>
+          <span class="stat__meta">en productos activos</span>
+        </article>
+        <article class="stat">
+          <span class="stat__index">05</span>
+          <p class="stat__label">Papelera</p>
+          <strong class="stat__value" id="stat-trash">—</strong>
+          <span class="stat__meta">para restaurar</span>
+        </article>
+      </section>
+
+      <div class="admin-tabs" role="tablist" aria-label="Vistas del panel">
+        <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="products-view" data-admin-tab="products">
+          <svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>
+          Productos <span class="admin-tab__count" id="tab-products-count">0</span>
+        </button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="trash-view" data-admin-tab="trash">
+          <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+          Papelera <span class="admin-tab__count" id="tab-trash-count">0</span>
+        </button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="history-view" data-admin-tab="history">
+          <svg class="icon" aria-hidden="true"><use href="#i-history"></use></svg>
+          Historial
+        </button>
+      </div>
+
+      <section class="admin-panel" id="products-view" role="tabpanel" aria-labelledby="products-title">
+        <div class="admin-panel__head">
+          <div>
+            <h2 class="admin-panel__title" id="products-title">Productos activos</h2>
+            <p class="admin-panel__hint">Editá precios, stock, estado y fotografías.</p>
+          </div>
+          <button class="btn btn--accent" id="new-product" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+            Nuevo producto
+          </button>
+        </div>
+
+        <div class="admin-toolbar">
+          <label class="admin-search" for="admin-search">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <span class="sr-only">Buscar producto</span>
+            <input id="admin-search" type="search" placeholder="Buscar por nombre, código o categoría…" autocomplete="off">
+          </label>
+          <div class="admin-filter">
+            <label for="admin-status-filter">Estado</label>
+            <select id="admin-status-filter">
+              <option value="all">Todos</option>
+              <option value="published">Publicados</option>
+              <option value="hidden">Ocultos</option>
+              <option value="out">Sin stock</option>
+            </select>
+          </div>
+          <span class="admin-toolbar__count" id="admin-results-count">0 productos</span>
+        </div>
+
+        <p class="admin-table-hint">Deslizá horizontalmente para ver todas las columnas</p>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Stock</th>
+                <th scope="col">Fotos</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="products-body"></tbody>
+          </table>
+          <p class="admin-empty" id="products-empty" hidden>No hay productos que coincidan con el filtro.</p>
+        </div>
+      </section>
+
+      <section class="admin-panel" id="trash-view" role="tabpanel" aria-labelledby="trash-title" hidden>
+        <div class="admin-panel__head">
+          <div>
+            <h2 class="admin-panel__title" id="trash-title">Papelera</h2>
+            <p class="admin-panel__hint">Los productos eliminados no se ven en la tienda. Podés restaurarlos o borrarlos definitivamente.</p>
+          </div>
+        </div>
+        <p class="admin-table-hint">Deslizá horizontalmente para ver todas las columnas</p>
+        <div class="admin-table-wrap">
+          <table class="admin-table admin-table--trash">
+            <thead>
+              <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Eliminado</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="trash-body"></tbody>
+          </table>
+          <p class="admin-empty" id="trash-empty" hidden>La papelera está vacía.</p>
+        </div>
+      </section>
+
+      <section class="admin-panel" id="history-view" role="tabpanel" aria-labelledby="history-title" hidden>
+        <div class="admin-panel__head">
+          <div>
+            <h2 class="admin-panel__title" id="history-title">Historial de cambios</h2>
+            <p class="admin-panel__hint">Últimas operaciones registradas sobre el catálogo.</p>
+          </div>
+          <button class="btn" id="refresh-history" type="button">Actualizar</button>
+        </div>
+        <div class="admin-history" id="history-list"></div>
+        <p class="admin-empty" id="history-empty" hidden>Todavía no hay cambios registrados.</p>
+      </section>
+
+      <section class="admin-danger" aria-labelledby="danger-title">
+        <div>
+          <p class="admin-danger__kicker">Zona de mantenimiento</p>
+          <h2 id="danger-title">Restaurar la demostración</h2>
+          <p>Vuelve los 32 productos a su estado original, elimina las fotos cargadas y borra la papelera. El historial también se reinicia.</p>
+        </div>
+        <button class="btn admin-btn-danger" id="reset-demo" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-restore"></use></svg>
+          Restaurar demo
+        </button>
+      </section>
+    </div>
+  </div>
+</main>
+
+<dialog class="admin-dialog" id="product-dialog" aria-labelledby="product-dialog-title">
+  <div class="admin-dialog__panel">
+    <form id="product-form" novalidate>
+      <header class="admin-dialog__head">
+        <div>
+          <p class="admin-dialog__kicker" id="product-dialog-kicker">Catálogo / Editar</p>
+          <h2 class="admin-dialog__title" id="product-dialog-title">Editar producto</h2>
+        </div>
+        <button class="icon-btn" type="button" data-close-dialog="product-dialog" aria-label="Cerrar editor">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <div class="admin-dialog__body">
+        <div class="admin-alert" id="editor-alert" role="alert" hidden></div>
+
+        <div class="editor-grid">
+          <div class="field">
+            <label for="product-code">Código</label>
+            <input id="product-code" name="code" required maxlength="20" placeholder="FM1039">
+          </div>
+          <div class="field">
+            <label for="product-status">Estado</label>
+            <select id="product-status" name="status">
+              <option value="published">Publicado</option>
+              <option value="hidden">Oculto</option>
+            </select>
+          </div>
+          <div class="field editor-grid__full">
+            <label for="product-name">Nombre</label>
+            <input id="product-name" name="name" required maxlength="140" placeholder="Nombre del producto">
+          </div>
+          <div class="field">
+            <label for="product-category">Categoría</label>
+            <select id="product-category" name="category" required></select>
+          </div>
+          <div class="field">
+            <label for="product-subcategory">Subcategoría</label>
+            <select id="product-subcategory" name="subcategory"></select>
+          </div>
+          <div class="field">
+            <label for="product-collection">Colección</label>
+            <select id="product-collection" name="collection">
+              <option value="">Sin colección</option>
+              <option value="combos">Combos en oferta</option>
+              <option value="nuevos">Nuevos ingresos</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="product-icon">Icono</label>
+            <select id="product-icon" name="icon"></select>
+          </div>
+          <div class="field">
+            <label for="product-price">Precio USD</label>
+            <input id="product-price" name="price" type="number" min="0" step="0.01" required inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="product-old-price">Precio anterior USD</label>
+            <input id="product-old-price" name="oldPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0 = sin oferta">
+          </div>
+          <div class="field">
+            <label for="product-stock">Stock</label>
+            <input id="product-stock" name="stock" type="number" min="0" step="1" required inputmode="numeric">
+          </div>
+          <div class="field editor-grid__full">
+            <label for="product-description">Descripción</label>
+            <textarea id="product-description" name="description" rows="3" maxlength="800" placeholder="Detalles, medidas o características del producto."></textarea>
+          </div>
+        </div>
+
+        <section class="editor-photos" aria-labelledby="editor-photos-title">
+          <div class="editor-photos__head">
+            <div>
+              <h3 id="editor-photos-title">Fotografías</h3>
+              <p>Hasta 5 fotos. Se convierten a WebP y se optimizan automáticamente.</p>
+            </div>
+            <label class="btn editor-upload" id="editor-upload-label" for="photo-input">
+              <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+              Agregar fotos
+            </label>
+            <input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+          </div>
+          <p class="editor-photos__note" id="editor-photos-note">Guardá el producto para poder agregar fotos.</p>
+          <div class="editor-photos__grid" id="editor-photos"></div>
+        </section>
+      </div>
+
+      <footer class="admin-dialog__foot">
+        <button class="btn" type="button" data-close-dialog="product-dialog">Cancelar</button>
+        <button class="btn btn--accent" id="save-product" type="submit">Guardar producto</button>
+      </footer>
+    </form>
+  </div>
+</dialog>
+
+<dialog class="admin-dialog admin-dialog--confirm" id="confirm-dialog" aria-labelledby="confirm-title">
+  <form method="dialog" class="admin-dialog__panel">
+    <header class="admin-dialog__head">
+      <div>
+        <p class="admin-dialog__kicker">Confirmación</p>
+        <h2 class="admin-dialog__title" id="confirm-title">Confirmar acción</h2>
+      </div>
+    </header>
+    <div class="admin-dialog__body">
+      <p class="confirm-text" id="confirm-text"></p>
+      <p class="confirm-warning" id="confirm-warning" hidden></p>
+    </div>
+    <footer class="admin-dialog__foot">
+      <button class="btn" type="submit" value="cancel">Cancelar</button>
+      <button class="btn admin-btn-danger" type="submit" value="confirm" id="confirm-accept">Confirmar</button>
+    </footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase.js"></script>
+<script src="js/data.js"></script>
+<script src="js/backend.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

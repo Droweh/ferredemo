@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi cuenta | FerroMax</title>
+  <meta name="description" content="Ingresá a tu cuenta FerroMax o creá una nueva en segundos.">
+  <meta name="theme-color" content="#ff9100">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body data-page="account" class="auth-page">
+
+<svg class="svg-sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.5-8 9-4.8-1.5-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+</svg>
+
+<header class="account-header">
+  <div class="container account-header__inner">
+    <a class="logo" href="index.html" aria-label="FerroMax, inicio">FERRO<span>MAX</span></a>
+    <nav class="account-nav" aria-label="Cuenta">
+      <a class="account-nav__link" href="index.html">Volver a la tienda</a>
+      <a class="account-nav__link account-nav__link--strong" id="admin-shortcut" href="admin.html" hidden>Panel</a>
+      <span class="account-nav__status" id="session-chip">Sin sesión</span>
+      <button class="account-nav__link" id="header-signout" type="button" hidden>Cerrar sesión</button>
+    </nav>
+  </div>
+</header>
+
+<main class="account-main">
+  <div class="container">
+    <div class="auth-layout">
+      <aside class="auth-aside" aria-label="Cuenta FerroMax">
+        <p class="auth-aside__kicker">Cuenta / FerroMax</p>
+        <p class="auth-aside__index" aria-hidden="true">02</p>
+        <h1 class="auth-aside__title">Tu cuenta, sin vueltas.</h1>
+        <p class="auth-aside__text">Ingresá para ver tu perfil. Los administradores además acceden al panel de catálogo, stock y precios.</p>
+        <ul class="auth-aside__list">
+          <li><span aria-hidden="true">01</span> Registro inmediato, sin confirmar correo.</li>
+          <li><span aria-hidden="true">02</span> Carrito y favoritos guardados en tu navegador.</li>
+          <li><span aria-hidden="true">03</span> Acceso separado para administración.</li>
+        </ul>
+        <span class="auth-aside__mark" aria-hidden="true"></span>
+      </aside>
+
+      <section class="auth-card" aria-labelledby="account-title">
+        <div id="auth-view">
+          <div class="auth-card__head">
+            <div>
+              <p class="auth-card__kicker" id="auth-kicker">Acceso de clientes</p>
+              <h2 class="auth-card__title" id="account-title">Ingresá o creá tu cuenta</h2>
+            </div>
+            <span class="mode-tag" id="mode-tag">Demo local</span>
+          </div>
+
+          <div class="auth-tabs" role="tablist" aria-label="Acceso o registro">
+            <button class="auth-tab is-active" id="tab-login" type="button" role="tab" aria-selected="true" aria-controls="login-panel" data-auth-tab="login">Ingresar</button>
+            <button class="auth-tab" id="tab-register" type="button" role="tab" aria-selected="false" aria-controls="register-panel" data-auth-tab="register">Crear cuenta</button>
+          </div>
+
+          <div class="auth-alert" id="auth-alert" role="alert" hidden></div>
+
+          <div class="auth-captcha" id="captcha-wrap" hidden>
+            <p class="auth-captcha__label">Verificación de seguridad</p>
+            <div id="turnstile-container"></div>
+            <p class="form-note" id="captcha-note">Protegido por Cloudflare Turnstile.</p>
+          </div>
+
+          <form class="auth-form" id="login-form" aria-labelledby="tab-login" novalidate>
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input id="login-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="nombre@email.com">
+            </div>
+            <div class="field">
+              <label for="login-password">Contraseña</label>
+              <div class="password-field">
+                <input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="Mínimo 8 caracteres">
+                <button class="password-toggle" type="button" data-toggle-password="login-password" aria-label="Mostrar contraseña">Ver</button>
+              </div>
+            </div>
+            <button class="btn btn--accent btn--full auth-submit" type="submit">Ingresar</button>
+            <p class="form-note">No hay recuperación por correo en esta demo. Si perdés la contraseña, un administrador puede ayudarte.</p>
+          </form>
+
+          <form class="auth-form" id="register-form" aria-labelledby="tab-register" hidden novalidate>
+            <div class="field">
+              <label for="register-name">Nombre y apellido</label>
+              <input id="register-name" name="name" autocomplete="name" required maxlength="80" placeholder="Tu nombre">
+            </div>
+            <div class="field">
+              <label for="register-email">Email</label>
+              <input id="register-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="nombre@email.com">
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="register-password">Contraseña</label>
+                <div class="password-field">
+                  <input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Mínimo 8 caracteres">
+                  <button class="password-toggle" type="button" data-toggle-password="register-password" aria-label="Mostrar contraseña">Ver</button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="register-confirm">Repetir contraseña</label>
+                <input id="register-confirm" name="confirm" type="password" autocomplete="new-password" required minlength="8" placeholder="Repetí la contraseña">
+              </div>
+            </div>
+            <label class="check-line">
+              <input id="register-terms" name="terms" type="checkbox" required>
+              <span>Acepto las condiciones de esta demostración y entiendo que no se realizan cobros reales.</span>
+            </label>
+            <button class="btn btn--accent btn--full auth-submit" type="submit">Crear cuenta</button>
+            <p class="form-note" id="register-note">La cuenta se crea al instante, sin verificación por email.</p>
+          </form>
+
+          <div class="demo-box" id="demo-box" hidden>
+            <div class="demo-box__head">
+              <span class="demo-box__title">Credenciales de demostración</span>
+              <span class="mode-tag mode-tag--dark">Solo local</span>
+            </div>
+            <div class="demo-box__row">
+              <code>admin@ferromax.com</code><code>Admin1234!</code>
+              <button class="demo-use" type="button" data-demo="admin">Usar admin</button>
+            </div>
+            <div class="demo-box__row">
+              <code>cliente@ferromax.com</code><code>Cliente1234!</code>
+              <button class="demo-use" type="button" data-demo="client">Usar cliente</button>
+            </div>
+            <p>Los datos del panel se guardan en este navegador. La papelera y el reset están disponibles para el admin.</p>
+          </div>
+
+          <p class="auth-switch">¿No tenés cuenta? <button type="button" data-auth-tab-link="register">Creala ahora</button></p>
+        </div>
+
+        <div id="account-view" hidden>
+          <div class="auth-card__head">
+            <div>
+              <p class="auth-card__kicker">Sesión activa</p>
+              <h2 class="auth-card__title" id="account-view-title">Mi cuenta</h2>
+            </div>
+            <span class="mode-tag" id="mode-tag-session">Demo local</span>
+          </div>
+
+          <div class="auth-alert" id="account-alert" role="status" hidden></div>
+
+          <div class="account-summary">
+            <div class="account-summary__avatar" aria-hidden="true">
+              <svg class="icon"><use href="#i-user"></use></svg>
+            </div>
+            <div>
+              <p class="account-summary__name" id="account-name">Cliente FerroMax</p>
+              <p class="account-summary__email" id="account-email"></p>
+            </div>
+            <span class="account-summary__role" id="account-role">Cliente</span>
+          </div>
+
+          <dl class="account-data">
+            <div><dt>Modo de datos</dt><dd id="account-mode">Local</dd></div>
+            <div><dt>Acceso</dt><dd id="account-access">Cliente</dd></div>
+            <div><dt>Carrito y favoritos</dt><dd>Guardados en este navegador</dd></div>
+          </dl>
+
+          <div class="account-actions">
+            <a class="btn btn--accent" href="index.html">Volver a la tienda</a>
+            <a class="btn" id="dashboard-admin-link" href="admin.html" hidden>Ir al panel</a>
+            <button class="btn" id="dashboard-signout" type="button">Cerrar sesión</button>
+          </div>
+
+          <section class="password-block" aria-labelledby="password-title">
+            <div class="password-block__head">
+              <h3 id="password-title">Cambiar contraseña</h3>
+              <span>Se aplica en el momento</span>
+            </div>
+            <div class="auth-alert" id="password-alert" role="alert" hidden></div>
+            <form class="auth-form" id="password-form" novalidate>
+              <div class="field" id="current-password-field">
+                <label for="current-password">Contraseña actual</label>
+                <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" required minlength="8">
+              </div>
+              <p class="form-note" id="password-note">En la demo local se verifica la contraseña actual. Con Supabase, la sesión activa autoriza el cambio.</p>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="new-password">Nueva contraseña</label>
+                  <input id="new-password" name="newPassword" type="password" autocomplete="new-password" required minlength="8">
+                </div>
+                <div class="field">
+                  <label for="confirm-password">Repetir nueva</label>
+                  <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" required minlength="8">
+                </div>
+              </div>
+              <button class="btn auth-submit" type="submit">Actualizar contraseña</button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="account-footer">
+  <div class="container account-footer__inner">
+    <p>FerroMax · Sitio de demostración</p>
+    <p class="footer-mono">Montevideo / Uruguay</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase.js"></script>
+<script src="js/data.js"></script>
+<script src="js/backend.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Configuración generada localmente (contiene solo claves públicas)
+public/js/config.js
+public/js/config.local.js
+
+# Entornos y credenciales
+.env
+.env.*
+!.env.example
+
+# Dependencias y temporales
+node_modules/
+supabase/.temp/
+supabase/.branches/
+.vercel/
+*.log
+*.tmp
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

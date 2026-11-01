@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FerroMax | Ferretería y herramientas en Uruguay</title>
+  <meta name="description" content="Herramientas profesionales, combos a batería y suministros para obra y jardín con envíos a todo Uruguay.">
+  <meta name="theme-color" content="#ff9100">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="home">
+
+<!-- Sprite SVG: todos los iconos de la interfaz ----------------------------- -->
+<svg class="svg-sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M4 4h4l2 5-2.5 1.5a13.5 13.5 0 0 0 6 6L15 14l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5 3.7 12.2a5.2 5.2 0 0 1 7.4-7.4l.9.9.9-.9a5.2 5.2 0 0 1 7.4 7.4z"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h10.2L20 7H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 5h13v10H2z"/><path d="M15 8h3l3 3v4h-6"/><circle cx="6" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14"/><path d="M2 9h20M6 15h4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.5-8 9-4.8-1.5-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 4h16v12H10l-6 4z"/><path d="M8 8h8M8 11.5h5"/></symbol>
+  <symbol id="i-screw" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><path d="M10.5 7.5 9.5 20h5l-1-12.5"/><path d="M10.5 11h3M10.2 14.5h3.6M9.8 18h4.4"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10"/><path d="M22 10v4M6 12h4M8 10v4M14 12h3"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13C12 9 9 7 5 7c0 4 3 7 7 6z"/><path d="M12 13c0-4 3-6 7-6 0 4-3 7-7 6z"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-roller" viewBox="0 0 24 24"><rect x="3" y="4" width="13" height="6"/><path d="M16 7h3v5h-8v3"/><rect x="9.5" y="15" width="3" height="6"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="i-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12"/><path d="M8 8V5h8v3M2 13h20M9 13v3h6v-3"/></symbol>
+  <symbol id="i-grinder" viewBox="0 0 24 24"><path d="M2 8h9v6H2z"/><path d="M11 10h4v2h-4"/><path d="M15 9h5v4h-5"/><circle cx="8" cy="17" r="3"/><path d="M5 17h6"/></symbol>
+  <symbol id="i-drill" viewBox="0 0 24 24"><path d="M2 7h9v7H2z"/><path d="M11 9h4v3h-4"/><path d="M15 8h3v5h-3"/><path d="M18 10.5h4"/><path d="M5 14v5h3v-5"/><path d="M6 7V4h4v3"/></symbol>
+  <symbol id="i-driver" viewBox="0 0 24 24"><path d="M3 8h8v6H3z"/><path d="M11 10h4v2h-4"/><path d="M15 9h3v4h-3"/><path d="M18 11h4M18.5 9.5 20 11l-1.5 1.5"/><path d="M5 14v5h3v-5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></symbol>
+  <symbol id="i-spray" viewBox="0 0 24 24"><path d="M9 8h6v13H9z"/><path d="M10 8V5h4v3"/><path d="M15 6h3M15 9h2M15 12h3M10 12h4"/></symbol>
+  <symbol id="i-level" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="6"/><path d="M7 9v6M17 9v6"/><circle cx="12" cy="12" r="1.5"/></symbol>
+  <symbol id="i-hose" viewBox="0 0 24 24"><path d="M4 6h8a3 3 0 1 1 0 6H8a3 3 0 1 0 0 6h10"/><path d="M18 15v6"/></symbol>
+</svg>
+
+<div class="topbar">
+  <div class="container topbar__inner">
+    <ul class="topbar__list">
+      <li>
+        <svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>
+        <span><span class="topbar__label">Tel.</span> <a href="tel:+59820000000">(+598) 2000 0000</a><span class="topbar__whatsapp"> · <a href="https://wa.me/59899000000">WhatsApp 099 000 000</a></span></span>
+      </li>
+      <li>
+        <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+        <span>Av. Ejemplo 1234, Montevideo</span>
+      </li>
+      <li>
+        <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+        <span>Lun. a Vie. 9–18 hs · Sáb. 9–13 hs</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="logo" href="index.html" aria-label="FerroMax, inicio">FERRO<span>MAX</span></a>
+
+    <form class="search" id="search-form" role="search">
+      <label class="sr-only" for="q">Buscar productos</label>
+      <input class="search__input" id="q" type="search" placeholder="Buscá taladros, amoladoras…" autocomplete="off">
+      <button class="search__button" type="submit">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <span class="search__label">Buscar</span>
+      </button>
+    </form>
+
+    <div class="header-actions">
+      <button class="action-btn" type="button" data-action="login" aria-label="Ingresar">
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        <span class="action-btn__label" aria-hidden="true">Ingresar</span>
+      </button>
+      <button class="action-btn" type="button" data-action="favorites" aria-label="Ver favoritos">
+        <svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg>
+        <span class="count" id="fav-count" aria-live="polite">0</span>
+      </button>
+      <button class="action-btn" type="button" data-action="open-cart" aria-label="Abrir carrito" aria-haspopup="dialog" aria-controls="cart">
+        <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+        <span class="action-btn__total" id="cart-total">USD 0</span>
+        <span class="count" id="cart-count" aria-live="polite">0</span>
+      </button>
+      <a class="action-btn action-btn--admin" id="admin-link" href="admin.html" aria-label="Abrir panel de administración" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+        <span class="action-btn__label">Panel</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<nav class="category-nav" aria-label="Categorías">
+  <div class="container category-nav__inner">
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="menu">
+      <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+      <span>Menú</span>
+    </button>
+    <ul class="category-nav__list" id="menu"></ul>
+  </div>
+</nav>
+
+<section class="hero" id="hero" aria-label="Promociones">
+  <div class="hero__viewport">
+    <div class="hero__slides" id="slides">
+      <article class="hero__slide hero__slide--1" role="group" aria-roledescription="slide" aria-label="1 de 3">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <p class="hero__kicker">01 / Línea profesional</p>
+            <h1 class="hero__title">Distribuidor oficial de herramientas a batería</h1>
+            <p class="hero__text">Taladros, amoladoras y combos 20V y 42V con envíos a todo el país.</p>
+            <a class="btn btn--accent" href="#combos">Ver combos</a>
+          </div>
+          <span class="hero__index" aria-hidden="true">01</span>
+        </div>
+      </article>
+
+      <article class="hero__slide hero__slide--2" role="group" aria-roledescription="slide" aria-label="2 de 3">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <p class="hero__kicker">02 / Jardín y obra</p>
+            <h2 class="hero__title">Todo para tu jardín y tu obra</h2>
+            <p class="hero__text">Motosierras, hormigoneras, hidrolavadoras y más, en stock.</p>
+            <a class="btn btn--accent" href="#nuevos">Ver novedades</a>
+          </div>
+          <span class="hero__index" aria-hidden="true">02</span>
+        </div>
+      </article>
+
+      <article class="hero__slide hero__slide--3" role="group" aria-roledescription="slide" aria-label="3 de 3">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <p class="hero__kicker">03 / Asesoramiento</p>
+            <h2 class="hero__title">¿Querés armar un combo a tu medida?</h2>
+            <p class="hero__text">Escribinos por WhatsApp y te asesoramos sin cargo.</p>
+            <a class="btn btn--accent" href="#contacto">Contactanos</a>
+          </div>
+          <span class="hero__index" aria-hidden="true">03</span>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <button class="hero__arrow hero__arrow--prev" type="button" aria-label="Slide anterior">
+    <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+  </button>
+  <button class="hero__arrow hero__arrow--next" type="button" aria-label="Slide siguiente">
+    <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+  </button>
+  <div class="hero__dots" id="dots" role="group" aria-label="Seleccionar slide"></div>
+</section>
+
+<main id="contenido">
+  <div class="container">
+    <section class="perks" aria-label="Beneficios de compra">
+      <ul class="perks__list">
+        <li class="perk">
+          <span class="perk__icon"><svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg></span>
+          <div><strong>Envíos a todo el país</strong><span class="perk__text">Entrega en 24 hs en Montevideo</span></div>
+        </li>
+        <li class="perk">
+          <span class="perk__icon"><svg class="icon" aria-hidden="true"><use href="#i-card"></use></svg></span>
+          <div><strong>Hasta 12 cuotas</strong><span class="perk__text">Con tarjetas seleccionadas</span></div>
+        </li>
+        <li class="perk">
+          <span class="perk__icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg></span>
+          <div><strong>Garantía oficial</strong><span class="perk__text">Respaldo en todas las marcas</span></div>
+        </li>
+        <li class="perk">
+          <span class="perk__icon"><svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg></span>
+          <div><strong>Asesoramiento</strong><span class="perk__text">Por WhatsApp o en sucursal</span></div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section" id="categorias" aria-labelledby="categories-title">
+      <div class="section__head">
+        <h2 class="section__title" id="categories-title">Categorías</h2>
+      </div>
+      <div class="category-grid" id="tiles"></div>
+    </section>
+
+    <section class="section" id="combos" aria-labelledby="combos-title">
+      <div class="section__head">
+        <h2 class="section__title" id="combos-title">Combos en oferta</h2>
+        <a class="section__link" href="categoria.html?cat=maquinas">Ver todos <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+      </div>
+      <div class="product-grid" id="grid-combos"></div>
+    </section>
+
+    <section class="section" id="nuevos" aria-labelledby="nuevos-title">
+      <div class="section__head">
+        <h2 class="section__title" id="nuevos-title">Nuevos ingresos</h2>
+        <a class="section__link" href="categoria.html?cat=linea-42v">Ver todos <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+      </div>
+      <div class="product-grid" id="grid-nuevos"></div>
+    </section>
+
+    <p class="empty-state" id="search-empty" role="status" hidden>No encontramos productos para tu búsqueda.</p>
+  </div>
+
+  <section class="info-band" aria-labelledby="info-title">
+    <div class="container">
+      <p class="info-band__kicker">FerroMax / Uruguay</p>
+      <h2 id="info-title">Herramientas profesionales en Uruguay</h2>
+      <p>Encontrá herramientas y suministros de calidad con un amplio catálogo, precios competitivos y envío rápido.</p>
+    </div>
+  </section>
+
+  <section class="contact" id="contacto" aria-labelledby="contact-title">
+    <div class="container contact__grid">
+      <div class="panel">
+        <h2 class="panel__title" id="contact-title">Sucursal</h2>
+        <dl class="contact-list">
+          <div class="contact-list__row">
+            <dt>Teléfono</dt>
+            <dd><a href="tel:+59820000000">2000 0000</a></dd>
+          </div>
+          <div class="contact-list__row">
+            <dt>Celular</dt>
+            <dd><a href="tel:+59899000000">099 000 000</a></dd>
+          </div>
+          <div class="contact-list__row">
+            <dt>Horario</dt>
+            <dd>Lun. a Vie. de 9 a 12:30 y 13:30 a 18 hs. Sáb. de 9 a 13 hs.</dd>
+          </div>
+          <div class="contact-list__row">
+            <dt>Dirección</dt>
+            <dd>Av. Ejemplo 1234, Montevideo, Uruguay</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel__title">Contacto instantáneo</h2>
+        <form class="contact-form" id="contact-form">
+          <div class="field">
+            <label for="cf-name">Nombre y apellido</label>
+            <input id="cf-name" name="name" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" name="email" type="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="cf-phone">Teléfono</label>
+            <input id="cf-phone" name="phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="cf-country">País</label>
+            <select id="cf-country" name="country">
+              <option>Uruguay</option>
+              <option>Argentina</option>
+              <option>Brasil</option>
+              <option>Paraguay</option>
+              <option>Otro país</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cf-message">Asunto</label>
+            <textarea id="cf-message" name="message" rows="3"></textarea>
+          </div>
+          <button class="btn" type="submit">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div>
+        <h3>Nosotros</h3>
+        <a href="#">Empresa</a>
+        <a href="#">Noticias</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div>
+        <h3>Soluciones</h3>
+        <a href="#combos">Destacados</a>
+        <a href="#categorias">Categorías</a>
+        <a href="#nuevos">Nuevos</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div>
+        <h3>Categorías</h3>
+        <a href="categoria.html?cat=maquinas">Máquinas</a>
+        <a href="categoria.html?cat=herramientas">Herramientas</a>
+        <a href="categoria.html?cat=linea-42v">Línea 42V</a>
+        <a href="categoria.html?cat=agro">Agro</a>
+        <a href="categoria.html?cat=casa-jardin">Casa y Jardín</a>
+      </div>
+      <div>
+        <h3>Ayuda</h3>
+        <a href="#">Preguntas</a>
+        <a href="#">Condiciones</a>
+      </div>
+      <div>
+        <h3>Mi cuenta</h3>
+        <a href="cuenta.html">Mi cuenta</a>
+        <a href="cuenta.html#registro">Crear cuenta</a>
+      </div>
+      <div>
+        <h3>Seguinos</h3>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">YouTube</a>
+        <a href="#">WhatsApp</a>
+      </div>
+    </div>
+    <div class="site-footer__bottom">
+      <p>© 2026 FerroMax · Sitio de demostración</p>
+      <p class="footer-mono">Montevideo / Uruguay</p>
+    </div>
+  </div>
+</footer>
+
+<div class="shade" data-action="close-cart" aria-hidden="true"></div>
+
+<aside class="cart-drawer" id="cart" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true" inert>
+  <header class="cart-drawer__head">
+    <h2 id="cart-title">Mi compra</h2>
+    <button class="icon-btn" type="button" data-action="close-cart" aria-label="Cerrar carrito">
+      <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+    </button>
+  </header>
+
+  <div class="cart-drawer__items" id="cart-items"></div>
+
+  <footer class="cart-drawer__foot">
+    <label class="sr-only" for="coupon">Cupón de descuento</label>
+    <input class="cart-drawer__coupon" id="coupon" placeholder="¿Tenés cupón de descuento?">
+    <div class="cart-drawer__total">
+      <span>Total</span>
+      <strong id="cart-drawer-total">USD 0</strong>
+    </div>
+    <button class="btn btn--accent btn--full" type="button" data-action="checkout">Continuar</button>
+  </footer>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase.js"></script>
+<script src="js/data.js"></script>
+<script src="js/backend.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
