@@ -102,14 +102,17 @@ function Configure-GitHubSecrets {
   Write-Step 'Conexión con GitHub Pages (opcional)'
 
   if (-not (Test-Command 'git')) {
-    Write-Warn 'Git no está instalado. Instalalo con: winget install Git.Git'
+    Write-Warn 'Git no está instalado.'
+    Write-Host '     Instalalo desde https://git-scm.com/download/win o con: winget install Git.Git'
     Write-Host '     Después subí el proyecto a GitHub y cargá los secretos manualmente (ver README.md).'
     return
   }
   if (-not (Test-Command 'gh')) {
-    Write-Warn 'GitHub CLI no está instalado. Instalalo con: winget install GitHub.cli'
+    Write-Warn 'GitHub CLI no está instalado.'
+    Write-Host '     Instalalo desde https://cli.github.com/ o con: winget install GitHub.cli'
     Write-Host '     Después ejecutá: gh auth login'
-    Write-Host '     Y cargá SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY y TURNSTILE_SITE_KEY en Settings > Secrets.'
+    Write-Host '     También podés cargar SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY y TURNSTILE_SITE_KEY'
+    Write-Host '     a mano en Settings > Secrets and variables > Actions.'
     return
   }
 

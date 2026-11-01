@@ -4,6 +4,20 @@ Sitio de demostración con catálogo, carrito, favoritos, cuentas y panel de adm
 
 La interfaz mantiene una estética industrial en naranja y carbón, con esquinas rectas, iconos SVG lineales y sin emojis.
 
+## Puesta en marcha rápida
+
+1. Creá un proyecto **Supabase Free** y anotá la **Project URL** y la **publishable key**.
+2. En el **SQL Editor**, ejecutá las 5 migraciones de `supabase/migrations/` en orden.
+3. Desactivá **Confirm email** en Authentication > Providers > Email.
+4. Creá el usuario administrador y asignale `{"role":"admin"}` en `raw_app_meta_data` (ver [Crear la cuenta administradora](#5-crear-la-cuenta-administradora)).
+5. Configurá **Turnstile** con el dominio de GitHub Pages (opcional, recomendado).
+6. Creá un repositorio **público** en GitHub y subí este proyecto a `main`.
+7. Cargá `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` y `TURNSTILE_SITE_KEY` en **Settings > Secrets and variables > Actions**.
+8. En **Settings > Pages**, elegí **Source: GitHub Actions**. El workflow publica `public/`.
+9. Abrí `https://TU_USUARIO.github.io/TU_REPO/`.
+
+También podés ejecutar `configurar.bat` para generar la configuración local y, si tenés GitHub CLI, cargar los secretos y disparar el deploy automáticamente.
+
 ## Qué incluye
 
 - 9 categorías y 36 subcategorías con 32 productos.
@@ -55,6 +69,8 @@ También sirve la extensión Live Server de VS Code apuntando a `public`.
 | Administrador | `admin@ferromax.com` | `Admin1234!` |
 | Cliente | `cliente@ferromax.com` | `Cliente1234!` |
 
+> Esas cuentas existen solo en el modo local. En Supabase hay que crear los usuarios desde Authentication > Users; las migraciones no los crean.
+
 El botón **Panel** aparece en el encabezado únicamente cuando la cuenta tiene rol admin. El acceso real está protegido por RLS en Supabase.
 
 ### Configurador automático
@@ -67,6 +83,8 @@ En Windows, ejecutá `configurar.bat` desde la raíz del proyecto. Pide:
 4. Site key pública de Turnstile (opcional, recomendada).
 
 Genera `public/js/config.js` con UTF-8, sin tocar el resto del proyecto. Si Git y GitHub CLI están instalados, también puede cargar los secretos del repositorio y disparar el deploy.
+
+GitHub CLI es opcional. Si no lo tenés, instalalo desde [cli.github.com](https://cli.github.com/) o cargá los secretos a mano en GitHub.
 
 > La `service_role` nunca debe llegar al navegador ni al repositorio. La publishable key y la site key son datos públicos.
 
@@ -113,9 +131,10 @@ Recomendado:
 
 1. En el dashboard de Cloudflare, creá un widget de Turnstile.
 2. Agregá el dominio de GitHub Pages, por ejemplo `usuario.github.io`.
-3. Copiá la **site key** al configurador, al secreto `TURNSTILE_SITE_KEY` o a `public/js/config.js`.
-4. Copiá la **secret key** en Supabase: **Authentication > Attack Protection > CAPTCHA protection**, proveedor Turnstile.
-5. Activá la protección CAPTCHA para registro e inicio de sesión.
+3. Si vas a probar Supabase en local con CAPTCHA activo, agregá también `localhost` al widget. Si no, desactivá CAPTCHA temporalmente.
+4. Copiá la **site key** al configurador, al secreto `TURNSTILE_SITE_KEY` o a `public/js/config.js`.
+5. Copiá la **secret key** en Supabase: **Authentication > Attack Protection > CAPTCHA protection**, proveedor Turnstile.
+6. Activá la protección CAPTCHA para registro e inicio de sesión.
 
 La secret key de Turnstile se queda en Supabase. Solo la site key llega al navegador.
 
@@ -148,6 +167,18 @@ La migración de Storage crea el bucket público `product-images` y sus polític
 Las fotos se comprimen en el navegador a WebP de hasta 1200 px antes de subirse.
 
 ## Publicar en GitHub Pages
+
+### Subir el proyecto
+
+1. Creá un repositorio **público** y vacío en GitHub (sin README, sin `.gitignore`, sin licencia).
+2. Desde la raíz de este proyecto, conectá el remoto y subí la rama `main`:
+
+```powershell
+git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
+git push -u origin main
+```
+
+Si Git Credential Manager lo pide, iniciá sesión con tu cuenta de GitHub.
 
 ### Opción A: configurador
 
