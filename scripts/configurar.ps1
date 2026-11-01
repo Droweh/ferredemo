@@ -232,6 +232,10 @@ try {
         Write-Warn 'Ingresá una URL absoluta que empiece con https://'
         continue
       }
+      if ($uri.AbsolutePath.Trim('/') -ne '') {
+        Write-Warn 'Usá solo el origen, por ejemplo https://tu-proyecto.supabase.co (sin /rest/v1 ni otras rutas).'
+        continue
+      }
       $url = $raw
     }
     Write-Ok "URL: $url"
