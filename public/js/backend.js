@@ -43,6 +43,23 @@
 
   const normalizeText = (value) => String(value || '').trim().toLowerCase();
 
+  function isSecretKey(value) {
+    const key = String(value || '').trim();
+    if (!key) return false;
+    if (/service_role/i.test(key) || key.startsWith('sb_secret_')) return true;
+    if (!key.startsWith('eyJ')) return false;
+    try {
+      const segment = key.split('.')[1];
+      if (!segment) return false;
+      const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+      const payload = JSON.parse(window.atob(padded));
+      return payload.role === 'service_role';
+    } catch (error) {
+      return false;
+    }
+  }
+
   function readStorage(key) {
     try {
       return JSON.parse(window.localStorage.getItem(key) || 'null');
@@ -132,7 +149,7 @@
   /* Supabase --------------------------------------------------------------- */
   function initSupabase() {
     if (mode !== 'supabase') return;
-    if (/service_role/i.test(supabaseAnonKey) || supabaseAnonKey.startsWith('sb_secret_')) {
+    if (isSecretKey(supabaseAnonKey)) {
       initError = new Error(
         'La configuración usa una clave secreta. Reemplazala por la publishable key o la anon public key.'
       );

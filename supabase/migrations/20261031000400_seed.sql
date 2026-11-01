@@ -61,5 +61,5 @@ $$;
 revoke all on function public.seed_demo_products() from public;
 revoke all on function public.seed_demo_products() from anon, authenticated;
 
--- Carga inicial. Si volv?s a ejecutar esta migraci?n, no duplica filas.
+-- Carga inicial. Si volvés a ejecutar esta migración, no duplica filas.
 select public.seed_demo_products();
