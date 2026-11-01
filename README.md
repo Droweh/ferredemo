@@ -178,7 +178,7 @@ git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
 git push -u origin main
 ```
 
-Si Git Credential Manager lo pide, iniciá sesión con tu cuenta de GitHub.
+Si `origin` ya existe, usá `git remote set-url origin https://github.com/TU_USUARIO/TU_REPO.git`. Si Git Credential Manager lo pide, iniciá sesión con tu cuenta de GitHub.
 
 ### Opción A: configurador
 
