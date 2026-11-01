@@ -153,6 +153,8 @@ where email = 'admin@tudominio.com';
 3. Cerrá y volvé a iniciar sesión. El rol se lee desde `app_metadata`; una sesión vieja puede seguir teniendo el rol anterior.
 4. Verificá que el botón **Panel** aparezca al iniciar sesión.
 
+> No reutilices la contraseña de la demo local para el administrador de Supabase. Elegí una contraseña única y fuerte: el sitio publicado es público.
+
 El rol `admin` es el único que puede cambiar productos o ver el historial. Las políticas RLS son la seguridad real; el botón es solo la parte visible.
 
 ### 6. Bucket de fotos
