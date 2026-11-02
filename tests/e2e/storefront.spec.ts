@@ -12,7 +12,7 @@ test.describe('Portada y catálogo', () => {
       page.getByRole('heading', { name: 'Distribuidor oficial de herramientas a batería' })
     ).toBeVisible();
 
-    await expect(page.locator('#grid-combos .product-card').first()).toContainText('FM1001');
+    await expect(page.locator('#grid-combos .product-card').first()).toContainText('FD1001');
     await expect(page.locator('#fav-count')).toHaveText('0');
     await expect(page.locator('#cart-count')).toHaveText('0');
   });
@@ -22,14 +22,14 @@ test.describe('Portada y catálogo', () => {
     await expect(page.locator('#category-grid')).not.toHaveAttribute('aria-busy', 'true');
     await expect(page.locator('#q')).toHaveValue('taladro');
     await expect(page.locator('#category-title')).toContainText('Resultados para');
-    /* La búsqueda también mira la subcategoría: FM1016 pertenece a "Taladros". */
+    /* La búsqueda también mira la subcategoría: FD1016 pertenece a "Taladros". */
     await expect(page.locator('#results-count')).toHaveText('4 productos');
-    for (const code of ['FM1001', 'FM1003', 'FM1004', 'FM1016']) {
+    for (const code of ['FD1001', 'FD1003', 'FD1004', 'FD1016']) {
       await expect(
         page.locator('#category-grid .product-card', { hasText: code })
       ).toBeVisible();
     }
-    await expect(page.locator('#category-grid .product-card', { hasText: 'FM1002' })).toBeHidden();
+    await expect(page.locator('#category-grid .product-card', { hasText: 'FD1002' })).toBeHidden();
 
     await page.goto('/categoria.html?q=producto-que-no-existe-123');
     await expect(page.locator('#search-empty')).toBeVisible();
@@ -60,7 +60,7 @@ test.describe('Portada y catálogo', () => {
     await expect(page).toHaveURL(/cat=ferreteria&sub=tornilleria$/);
     await expect(page.locator('#category-title')).toHaveText('Tornillería');
     await expect(page.locator('#category-grid .product-card')).toHaveCount(1);
-    await expect(page.locator('#category-grid .product-card')).toContainText('FM1021');
+    await expect(page.locator('#category-grid .product-card')).toContainText('FD1021');
   });
 
   test('el orden por precio funciona en el catálogo', async ({ page }) => {
@@ -78,7 +78,7 @@ test.describe('Portada y catálogo', () => {
 test.describe('Carrito y favoritos', () => {
   test('agrega, cambia cantidades, calcula el total y persiste al recargar', async ({ page }) => {
     await page.goto('/');
-    const combo = page.locator('#grid-combos .product-card', { hasText: 'FM1001' });
+    const combo = page.locator('#grid-combos .product-card', { hasText: 'FD1001' });
     await combo.getByRole('button', { name: 'Agregar al carrito' }).click();
 
     await expect(page.locator('#cart-count')).toHaveText('1');
@@ -109,7 +109,7 @@ test.describe('Carrito y favoritos', () => {
   test('los favoritos se marcan y persisten en el navegador', async ({ page }) => {
     await page.goto('/');
     const favorite = page
-      .locator('#grid-combos .product-card', { hasText: 'FM1001' })
+      .locator('#grid-combos .product-card', { hasText: 'FD1001' })
       .locator('.favorite-btn');
 
     await expect(favorite).toHaveAttribute('aria-pressed', 'false');
@@ -119,7 +119,7 @@ test.describe('Carrito y favoritos', () => {
 
     await page.reload();
     const persisted = page
-      .locator('#grid-combos .product-card', { hasText: 'FM1001' })
+      .locator('#grid-combos .product-card', { hasText: 'FD1001' })
       .locator('.favorite-btn');
     await expect(persisted).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('#fav-count')).toHaveText('1');

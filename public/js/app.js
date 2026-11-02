@@ -1,4 +1,4 @@
-/* Lógica de la tienda de FerroMax.
+/* Lógica de la tienda de FerreDemo.
    El catálogo puede venir del modo local o de Supabase; el carrito y los
    favoritos siempre se guardan en el navegador. */
 (() => {
@@ -209,6 +209,7 @@
 
     return `
       <article class="product-card" data-id="${product.id}">
+        <a class="product-card__overlay" href="producto.html?id=${product.id}" aria-label="Ver ${name}"></a>
         <div class="product-card__media">
           ${off ? `<span class="badge">${off}% OFF</span>` : ''}
           <button class="favorite-btn${isFavorite ? ' is-active' : ''}" type="button" data-action="favorite" data-id="${product.id}" aria-label="${isFavorite ? 'Quitar' : 'Agregar'} ${name} ${isFavorite ? 'de' : 'a'} favoritos" aria-pressed="${String(isFavorite)}">
@@ -307,18 +308,28 @@
     if (favCount) favCount.textContent = String(state.favorites.size);
   }
 
+  function updateFavoriteButton(button, product, isFavorite) {
+    button.classList.toggle('is-active', isFavorite);
+    button.setAttribute('aria-pressed', String(isFavorite));
+
+    const label = $('[data-favorite-label]', button);
+    if (label) {
+      label.textContent = isFavorite ? 'Guardado en favoritos' : 'Guardar en favoritos';
+      button.removeAttribute('aria-label');
+      return;
+    }
+
+    button.setAttribute(
+      'aria-label',
+      `${isFavorite ? 'Quitar' : 'Agregar'} ${product.name} ${isFavorite ? 'de' : 'a'} favoritos`
+    );
+  }
+
   function syncFavoriteButtons() {
-    $$('.favorite-btn').forEach((button) => {
+    $$('[data-action="favorite"]').forEach((button) => {
       const product = productById.get(Number(button.dataset.id));
       if (!product) return;
-
-      const isFavorite = state.favorites.has(product.id);
-      button.classList.toggle('is-active', isFavorite);
-      button.setAttribute('aria-pressed', String(isFavorite));
-      button.setAttribute(
-        'aria-label',
-        `${isFavorite ? 'Quitar' : 'Agregar'} ${product.name} ${isFavorite ? 'de' : 'a'} favoritos`
-      );
+      updateFavoriteButton(button, product, state.favorites.has(product.id));
     });
   }
 
@@ -416,22 +427,27 @@
       applyFilters();
     };
 
-    input.addEventListener('input', update);
+    if (pageType === 'home' || pageType === 'catalog') input.addEventListener('input', update);
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      update();
+      const query = input.value.trim();
 
-      if (searchQuery === '') {
+      if (query === '') {
+        if (pageType === 'home' || pageType === 'catalog') {
+          searchQuery = '';
+          applyFilters();
+        }
         input.focus();
         return;
       }
 
-      if (pageType === 'home') {
-        window.location.href = `categoria.html?q=${encodeURIComponent(searchQuery)}`;
+      if (pageType !== 'catalog') {
+        window.location.href = `categoria.html?q=${encodeURIComponent(query)}`;
         return;
       }
 
+      searchQuery = query;
       input.blur();
       applyFilters();
     });
@@ -455,7 +471,7 @@
       linkElement.textContent = linkText;
     }
 
-    document.title = `${title} | FerroMax`;
+    document.title = `${title} | FerreDemo`;
   }
 
   function setupCatalogPage() {
@@ -696,16 +712,16 @@
     const { category, subcategory, query } = catalog;
 
     if (!category) {
-      document.title = query ? `Búsqueda: ${query} | FerroMax` : 'Catálogo | FerroMax';
+      document.title = query ? `Búsqueda: ${query} | FerreDemo` : 'Catálogo | FerreDemo';
       const meta = $('meta[name="description"]');
-      if (meta) meta.content = `Resultados de búsqueda para “${query}” en el catálogo FerroMax.`;
+      if (meta) meta.content = `Resultados de búsqueda para “${query}” en el catálogo FerreDemo.`;
       return;
     }
 
     const pageName = subcategory ? `${subcategory.name} · ${category.name}` : category.name;
-    document.title = `${pageName} | FerroMax`;
+    document.title = `${pageName} | FerreDemo`;
     const meta = $('meta[name="description"]');
-    if (meta) meta.content = `${category.description} Catálogo FerroMax con envíos a todo Uruguay.`;
+    if (meta) meta.content = `${category.description} Catálogo FerreDemo con envíos a todo Uruguay.`;
   }
 
   function initSort() {
@@ -715,6 +731,334 @@
     select.addEventListener('change', () => {
       catalog.sort = select.value;
       if (catalog.category || catalog.query) renderCatalogGrid();
+    });
+  }
+
+  /* Ficha de producto ------------------------------------------------------- */
+  const productPage = {
+    product: null,
+    images: [],
+    index: 0,
+  };
+
+  const imageAlt = (product, image, index) =>
+    image.alt || `${product.name} · foto ${index + 1}`;
+
+  function renderProductBreadcrumb(product) {
+    const list = $('#product-breadcrumb');
+    if (!list) return;
+
+    const category = categoryById.get(product.category);
+    const subcategory = getSubcategory(product);
+    const items = ['<li><a href="index.html">Inicio</a></li>'];
+
+    if (category) {
+      items.push(`<li><a href="${categoryHref(category)}">${escapeHtml(category.name)}</a></li>`);
+    }
+    if (category && subcategory) {
+      items.push(
+        `<li><a href="${subcategoryHref(category, subcategory)}">${escapeHtml(subcategory.name)}</a></li>`
+      );
+    }
+    items.push(`<li><span aria-current="page">${escapeHtml(product.name)}</span></li>`);
+    list.innerHTML = items.join('');
+  }
+
+  function updateGalleryCounter() {
+    const counter = $('#product-gallery-counter');
+    if (!counter) return;
+    const total = productPage.images.length;
+    counter.textContent = total
+      ? `${String(productPage.index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`
+      : 'Sin fotos';
+  }
+
+  function selectGalleryImage(index) {
+    if (!productPage.images[index]) return;
+    productPage.index = index;
+
+    const image = productPage.images[index];
+    const preview = $('#product-gallery-image');
+    if (preview) {
+      preview.src = image.url;
+      preview.alt = imageAlt(productPage.product, image, index);
+    }
+
+    const main = $('#product-gallery-main');
+    if (main) {
+      main.setAttribute(
+        'aria-label',
+        `Ampliar foto ${index + 1} de ${productPage.images.length}`
+      );
+    }
+
+    $$('#product-gallery-thumbs [data-action="select-image"]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(Number(button.dataset.index) === index));
+    });
+    updateGalleryCounter();
+  }
+
+  function renderProductGallery(product) {
+    const main = $('#product-gallery-main');
+    const thumbs = $('#product-gallery-thumbs');
+    if (!main || !thumbs) return;
+
+    productPage.images = Array.isArray(product.images) ? product.images : [];
+    productPage.index = 0;
+
+    if (productPage.images.length === 0) {
+      main.disabled = true;
+      main.removeAttribute('data-action');
+      main.innerHTML = `
+        <span class="product-gallery__empty">
+          ${icon(product.icon, 'product-gallery__empty-icon')}
+          <span>Sin fotos cargadas</span>
+        </span>`;
+      thumbs.innerHTML = '';
+    } else {
+      const cover = productPage.images[0];
+      main.disabled = false;
+      main.setAttribute('data-action', 'zoom-image');
+      main.setAttribute(
+        'aria-label',
+        `Ampliar foto 1 de ${productPage.images.length}`
+      );
+      main.innerHTML = `
+        <img class="product-gallery__photo" id="product-gallery-image"
+          src="${escapeHtml(cover.url)}" alt="${escapeHtml(imageAlt(product, cover, 0))}"
+          decoding="async">`;
+      thumbs.innerHTML = productPage.images
+        .map(
+          (image, index) => `
+            <button class="product-gallery__thumb" type="button" data-action="select-image"
+              data-index="${index}" aria-pressed="${index === 0}"
+              aria-label="Ver foto ${index + 1} de ${productPage.images.length}">
+              <img src="${escapeHtml(image.url)}" alt="" loading="lazy" decoding="async">
+            </button>`
+        )
+        .join('');
+    }
+
+    updateGalleryCounter();
+  }
+
+  function renderProductDetails(product) {
+    const category = categoryById.get(product.category);
+    const subcategory = getSubcategory(product);
+    const off = discountPct(product);
+
+    $('#product-code').textContent = product.code;
+    $('#product-category').textContent = category ? category.name : 'Catálogo';
+    $('#product-name').textContent = product.name;
+    $('#product-price').textContent = formatUSD(product.price);
+
+    const oldPrice = $('#product-old-price');
+    oldPrice.hidden = !off;
+    oldPrice.textContent = off ? `Antes ${formatUSD(product.oldPrice)}` : '';
+
+    const offBadge = $('#product-off');
+    offBadge.hidden = !off;
+    offBadge.textContent = off ? `${off}% OFF` : '';
+
+    const stock = $('#product-stock');
+    stock.classList.toggle('is-in', product.inStock);
+    stock.classList.toggle('is-out', !product.inStock);
+    stock.innerHTML = `<span class="stock-dot" aria-hidden="true"></span>${
+      product.inStock ? 'En stock · Entrega en 24 hs' : 'Agotado'
+    }`;
+
+    $('#product-description').textContent =
+      product.description || 'Producto de demostración sin descripción adicional.';
+
+    const features = Array.isArray(product.features) ? product.features : [];
+    const featuresList = $('#product-features');
+    featuresList.hidden = features.length === 0;
+    featuresList.innerHTML = features
+      .map((feature) => `<li>${escapeHtml(feature)}</li>`)
+      .join('');
+
+    const addButton = $('#product-add');
+    addButton.dataset.id = String(product.id);
+    addButton.disabled = !product.inStock;
+    addButton.textContent = product.inStock ? 'Agregar al carrito' : 'Producto agotado';
+
+    const favoriteButton = $('#product-favorite');
+    favoriteButton.dataset.id = String(product.id);
+
+    $('#product-meta-code').textContent = product.code;
+    $('#product-meta-category').textContent = category ? category.name : '—';
+    $('#product-meta-subcategory').textContent = subcategory ? subcategory.name : '—';
+    $('#product-meta-stock').textContent = product.inStock ? 'Disponible' : 'Agotado';
+  }
+
+  function renderRelatedProducts(product) {
+    const section = $('#product-related');
+    const grid = $('#product-related-grid');
+    if (!section || !grid) return;
+
+    const related = state.products
+      .filter((item) => item.id !== product.id && item.category === product.category)
+      .slice(0, 4);
+
+    section.hidden = related.length === 0;
+    grid.innerHTML = related.map(productCard).join('');
+  }
+
+  function updateProductMeta(product) {
+    const category = categoryById.get(product.category);
+    const description = String(product.description || '').slice(0, 160);
+    const cover = coverOf(product);
+    const imageUrl = cover && cover.url ? new URL(cover.url, window.location.href).href : '';
+    document.title = `${product.name} | FerreDemo`;
+
+    const meta = $('meta[name="description"]');
+    if (meta) meta.content = description;
+
+    const ogTitle = $('#og-title');
+    const ogDescription = $('#og-description');
+    const ogImage = $('#og-image');
+    const ogUrl = $('#og-url');
+    if (ogTitle) ogTitle.content = product.name;
+    if (ogDescription) ogDescription.content = description;
+    if (ogImage) ogImage.content = imageUrl;
+    if (ogUrl) ogUrl.content = window.location.href;
+
+    const structured = $('#product-jsonld');
+    if (structured) {
+      structured.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        sku: product.code,
+        description: product.description || '',
+        image: imageUrl || undefined,
+        category: category ? category.name : undefined,
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'USD',
+          price: Number(product.price).toFixed(2),
+          availability: product.inStock
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+        },
+      });
+    }
+  }
+
+  function showProductError(title = 'No encontramos este producto', text = '') {
+    const content = $('#product-content');
+    const error = $('#product-error');
+    if (content) content.hidden = true;
+    if (error) error.hidden = false;
+
+    const titleElement = $('#product-error-title');
+    const textElement = $('#product-error-text');
+    if (titleElement && title) titleElement.textContent = title;
+    if (textElement && text) textElement.textContent = text;
+
+    document.title = 'Producto no encontrado | FerreDemo';
+    const meta = $('meta[name="description"]');
+    if (meta) meta.content = 'El producto que buscás no existe o ya no está publicado.';
+  }
+
+  function renderProductPage() {
+    const params = new URLSearchParams(window.location.search);
+    const id = Number(params.get('id'));
+    const product = Number.isInteger(id) ? productById.get(id) : null;
+
+    if (!product) {
+      showProductError(
+        'No encontramos este producto',
+        'El enlace puede estar incompleto o el producto ya no está publicado. Volvé al catálogo para seguir recorriendo la demo.'
+      );
+      return;
+    }
+
+    productPage.product = product;
+    catalog.category = categoryById.get(product.category) || null;
+    renderProductBreadcrumb(product);
+    renderProductGallery(product);
+    renderProductDetails(product);
+    renderRelatedProducts(product);
+    updateProductMeta(product);
+    if (catalog.category) markActiveCategory();
+    syncFavoriteButtons();
+  }
+
+  /* Galería ampliada -------------------------------------------------------- */
+  function updateLightbox() {
+    const image = productPage.images[productPage.index];
+    if (!image) return;
+
+    const preview = $('#lightbox-image');
+    const caption = $('#lightbox-caption');
+    const counter = $('#lightbox-counter');
+    const prev = $('[data-action="lightbox-prev"]');
+    const next = $('[data-action="lightbox-next"]');
+
+    if (preview) {
+      preview.src = image.url;
+      preview.alt = imageAlt(productPage.product, image, productPage.index);
+    }
+    if (caption) {
+      caption.textContent = `${productPage.product.name} · foto ${productPage.index + 1}`;
+    }
+    if (counter) {
+      counter.textContent = `${productPage.index + 1} / ${productPage.images.length}`;
+    }
+
+    const single = productPage.images.length < 2;
+    if (prev) prev.hidden = single;
+    if (next) next.hidden = single;
+  }
+
+  function openLightbox(index = productPage.index) {
+    if (!productPage.images.length) return;
+    selectGalleryImage(index);
+    updateLightbox();
+
+    const dialog = $('#product-lightbox');
+    if (!dialog) return;
+    document.body.classList.add('lightbox-open');
+    if (!dialog.open) {
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+  }
+
+  function closeLightbox() {
+    const dialog = $('#product-lightbox');
+    document.body.classList.remove('lightbox-open');
+    if (dialog && dialog.open) dialog.close();
+  }
+
+  function stepLightbox(step) {
+    if (!productPage.images.length) return;
+    const total = productPage.images.length;
+    const next = ((productPage.index + step) % total + total) % total;
+    selectGalleryImage(next);
+    updateLightbox();
+  }
+
+  function initProductLightbox() {
+    const dialog = $('#product-lightbox');
+    if (!dialog) return;
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) closeLightbox();
+    });
+    dialog.addEventListener('close', () => {
+      document.body.classList.remove('lightbox-open');
+    });
+    document.addEventListener('keydown', (event) => {
+      if (!dialog.open) return;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        stepLightbox(-1);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        stepLightbox(1);
+      }
     });
   }
 
@@ -792,12 +1136,7 @@
     }
 
     persistFavorites();
-    button.classList.toggle('is-active', !isFavorite);
-    button.setAttribute('aria-pressed', String(!isFavorite));
-    button.setAttribute(
-      'aria-label',
-      isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`
-    );
+    updateFavoriteButton(button, product, !isFavorite);
     updateFavoritesUI();
   }
 
@@ -1022,6 +1361,21 @@
       case 'favorite':
         toggleFavorite(control, control.dataset.id);
         break;
+      case 'select-image':
+        selectGalleryImage(Number(control.dataset.index));
+        break;
+      case 'zoom-image':
+        openLightbox(productPage.index);
+        break;
+      case 'close-lightbox':
+        closeLightbox();
+        break;
+      case 'lightbox-prev':
+        stepLightbox(-1);
+        break;
+      case 'lightbox-next':
+        stepLightbox(1);
+        break;
       case 'qty':
         changeQuantity(control.dataset.id, control.dataset.step);
         break;
@@ -1047,6 +1401,11 @@
         window.location.href,
         'Reintentar'
       );
+      return;
+    }
+
+    if (pageType === 'product') {
+      showProductError('No pudimos cargar el producto', message);
       return;
     }
 
@@ -1081,6 +1440,7 @@
 
     const catalogReady = pageType === 'catalog' ? setupCatalogPage() : false;
     if (catalogReady) markActiveCategory();
+    if (pageType === 'product') renderProductPage();
     if (pageType === 'home') renderProducts();
 
     renderCart();
@@ -1098,6 +1458,7 @@
   initSlider();
   initContactForm();
   initSort();
+  initProductLightbox();
   initSession();
 
   document.addEventListener('click', handleAction);

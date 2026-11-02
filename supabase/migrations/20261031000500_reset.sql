@@ -1,4 +1,4 @@
--- FerroMax · restauración de la demo
+-- FerreDemo · restauración de la demo
 -- Solo el admin puede ejecutarla. El frontend borra primero las fotos del
 -- bucket y después llama a esta función con supabase.rpc('reset_demo_catalog').
 

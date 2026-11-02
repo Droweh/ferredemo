@@ -139,6 +139,6 @@ test.describe('Acceso y cuentas', () => {
     await page.goto('/admin.html');
     await page.getByRole('button', { name: 'Entrar como admin demo' }).click();
     await expect(page.locator('#admin-shell')).toBeVisible();
-    await expect(page.locator('#admin-user-name')).toHaveText('Admin FerroMax');
+    await expect(page.locator('#admin-user-name')).toHaveText('Admin FerreDemo');
   });
 });

@@ -1,5 +1,6 @@
-/* Datos de demostración de FerroMax.
-   Los textos visibles se escriben en caja normal; la interfaz los pasa a mayúsculas. */
+/* Datos de demostración de FerreDemo.
+   Los textos visibles se escriben en caja normal; la interfaz los pasa a mayúsculas.
+   Las fotos son referencias locales de DIT Ferretería para uso exclusivo de la demo. */
 window.FERROMAX = {
   categories: [
     {
@@ -114,8 +115,17 @@ window.FERROMAX = {
   products: [
     {
       id: 1,
-      code: 'FM1001',
+      code: 'FD1001',
       name: 'Combo 15 · taladro + atornillador + amoladora 20V',
+      description:
+        'Kit de tres máquinas a batería para armar un set de trabajo completo. Incluye taladro, atornillador y amoladora de la línea 20V, con valija para trasladarlas.',
+      features: [
+        'Tres máquinas en una sola valija',
+        'Baterías y cargador incluidos',
+        'Empuñaduras ergonómicas',
+        'Uso profesional y doméstico',
+      ],
+      images: ['images/products/p01-1.jpg'],
       icon: 'toolbox',
       price: 645,
       oldPrice: 720,
@@ -126,8 +136,17 @@ window.FERROMAX = {
     },
     {
       id: 2,
-      code: 'FM1002',
+      code: 'FD1002',
       name: 'Combo 30 · kit a batería con valija',
+      description:
+        'Set de herramientas a batería pensado para mantenimiento y taller. Viene organizado en valija rígida con baterías, cargador y accesorios.',
+      features: [
+        'Kit multipropósito a batería',
+        'Valija rígida de transporte',
+        'Baterías recargables incluidas',
+        'Accesorios para distintas tareas',
+      ],
+      images: ['images/products/p02-1.jpg'],
       icon: 'toolbox',
       price: 480,
       oldPrice: 0,
@@ -138,8 +157,17 @@ window.FERROMAX = {
     },
     {
       id: 3,
-      code: 'FM1003',
+      code: 'FD1003',
       name: 'Combo 35 · taladro percutor + rotomartillo',
+      description:
+        'Dos equipos de perforación para alternar entre madera, metal y mampostería. El taladro percutor resuelve el trabajo liviano y el rotomartillo cubre la obra.',
+      features: [
+        'Taladro percutor y rotomartillo',
+        'Sistema SDS Plus',
+        'Baterías y cargador incluidos',
+        'Valija de transporte',
+      ],
+      images: ['images/products/p03-1.jpg'],
       icon: 'toolbox',
       price: 620,
       oldPrice: 0,
@@ -150,8 +178,17 @@ window.FERROMAX = {
     },
     {
       id: 4,
-      code: 'FM1004',
+      code: 'FD1004',
       name: 'Combo 42V · amoladora, taladro y llave',
+      description:
+        'Combo de tres herramientas de la línea 42V para corte, perforación y ajuste. La llave de impacto suma fuerza para tuercas y pernos de mayor diámetro.',
+      features: [
+        'Amoladora, taladro y llave de impacto',
+        'Línea 42V de alto rendimiento',
+        'Baterías y cargador incluidos',
+        'Bolso reforzado',
+      ],
+      images: ['images/products/p04-1.jpg'],
       icon: 'toolbox',
       price: 770,
       oldPrice: 0,
@@ -162,8 +199,17 @@ window.FERROMAX = {
     },
     {
       id: 5,
-      code: 'FM1005',
+      code: 'FD1005',
       name: 'Combo 20 · atornillador + linterna 20V',
+      description:
+        'Set compacto para tareas de montaje y reparación. El atornillador trabaja con la misma batería de la linterna portátil.',
+      features: [
+        'Atornillador y linterna',
+        'Batería compartida 20V',
+        'Formato compacto',
+        'Ideal para mantenimiento',
+      ],
+      images: ['images/products/p05-1.jpg'],
       icon: 'toolbox',
       price: 421,
       oldPrice: 424,
@@ -174,8 +220,17 @@ window.FERROMAX = {
     },
     {
       id: 6,
-      code: 'FM1006',
+      code: 'FD1006',
       name: 'Super combo 5 en 1 brushless 20V',
+      description:
+        'Cinco herramientas con motor brushless para rendimiento y autonomía. Incluye los equipos principales, baterías, cargador y valija de organización.',
+      features: [
+        'Cinco herramientas en un kit',
+        'Motores brushless',
+        'Baterías y cargador incluidos',
+        'Valija rígida',
+      ],
+      images: ['images/products/p06-1.jpg'],
       icon: 'toolbox',
       price: 575,
       oldPrice: 934,
@@ -186,8 +241,17 @@ window.FERROMAX = {
     },
     {
       id: 7,
-      code: 'FM1007',
+      code: 'FD1007',
       name: 'Kit combo rotomartillo + amoladora + aspiradora',
+      description:
+        'Kit de obra que combina perforación, corte y limpieza. La aspiradora ayuda a controlar el polvo mientras trabajás.',
+      features: [
+        'Rotomartillo, amoladora y aspiradora',
+        'Baterías y cargador incluidos',
+        'Accesorios de corte y perforación',
+        'Valija de transporte',
+      ],
+      images: ['images/products/p07-1.jpg'],
       icon: 'toolbox',
       price: 302,
       oldPrice: 0,
@@ -198,8 +262,17 @@ window.FERROMAX = {
     },
     {
       id: 8,
-      code: 'FM1008',
+      code: 'FD1008',
       name: 'Set llave de impacto ¾" 1350 Nm con accesorios',
+      description:
+        'Set de llave de impacto de alto torque para taller mecánico y trabajo pesado. Incluye dados y accesorios para distintas medidas.',
+      features: [
+        'Torque de 1350 Nm',
+        'Encastre de 3/4 de pulgada',
+        'Dados y accesorios incluidos',
+        'Valija rígida',
+      ],
+      images: ['images/products/p08-1.jpg'],
       icon: 'wrench',
       price: 553,
       oldPrice: 0,
@@ -210,8 +283,17 @@ window.FERROMAX = {
     },
     {
       id: 11,
-      code: 'FM1011',
+      code: 'FD1011',
       name: 'Set x2 baterías 2.0Ah + cargador 42V',
+      description:
+        'Dos baterías de iones de litio y un cargador para mantener la línea 42V en marcha. Ideal para alternar equipos sin cortar el trabajo.',
+      features: [
+        'Dos baterías de 2.0Ah',
+        'Cargador 42V incluido',
+        'Indicador de carga',
+        'Compatible con línea 42V',
+      ],
+      images: ['images/products/p11-1.jpg'],
       icon: 'battery',
       price: 120,
       oldPrice: 0,
@@ -222,8 +304,17 @@ window.FERROMAX = {
     },
     {
       id: 12,
-      code: 'FM1012',
+      code: 'FD1012',
       name: 'Lustra pulidora a batería 42V 150 mm',
+      description:
+        'Pulidora de 150 mm para lustre y terminaciones en pintura, madera y metal. El motor brushless sostiene la velocidad en trabajos prolongados.',
+      features: [
+        'Motor brushless',
+        'Plato de 150 mm',
+        'Batería y cargador incluidos',
+        'Mango auxiliar',
+      ],
+      images: ['images/products/p12-1.jpg'],
       icon: 'grinder',
       price: 224,
       oldPrice: 0,
@@ -234,8 +325,17 @@ window.FERROMAX = {
     },
     {
       id: 13,
-      code: 'FM1013',
+      code: 'FD1013',
       name: 'Amoladora angular a batería 42V 115 mm',
+      description:
+        'Amoladora angular de 115 mm para corte y desbaste sin cables. Incluye baterías, cargador y accesorios en valija.',
+      features: [
+        'Disco de 115 mm',
+        'Motor brushless',
+        'Dos baterías y cargador',
+        'Valija de transporte',
+      ],
+      images: ['images/products/p13-1.jpg'],
       icon: 'grinder',
       price: 259,
       oldPrice: 0,
@@ -246,8 +346,17 @@ window.FERROMAX = {
     },
     {
       id: 14,
-      code: 'FM1014',
+      code: 'FD1014',
       name: 'Rotomartillo a batería 42V SDS Plus 2.5 J',
+      description:
+        'Rotomartillo liviano para perforar mampostería y hormigón con sistema SDS Plus. Entrega 2.5 julios de energía por golpe.',
+      features: [
+        'Encastre SDS Plus',
+        'Energía de impacto 2.5 J',
+        'Baterías y cargador incluidos',
+        'Valija con mechas y cinceles',
+      ],
+      images: ['images/products/p14-1.jpg'],
       icon: 'drill',
       price: 259,
       oldPrice: 0,
@@ -258,8 +367,17 @@ window.FERROMAX = {
     },
     {
       id: 15,
-      code: 'FM1015',
+      code: 'FD1015',
       name: 'Rotomartillo a batería 42V 28 mm 4.5 J',
+      description:
+        'Rotomartillo de mayor potencia para perforaciones de hasta 28 mm. Pensado para obra y trabajos exigentes con hormigón.',
+      features: [
+        'Capacidad de 28 mm',
+        'Energía de impacto 4.5 J',
+        'Dos baterías de 2.5Ah',
+        'Valija con accesorios',
+      ],
+      images: ['images/products/p15-1.jpg'],
       icon: 'drill',
       price: 341,
       oldPrice: 0,
@@ -270,8 +388,17 @@ window.FERROMAX = {
     },
     {
       id: 16,
-      code: 'FM1016',
+      code: 'FD1016',
       name: 'Atornillador de impacto 20V brushless 285 Nm',
+      description:
+        'Atornillador de impacto compacto para montaje y desmontaje de tornillos y tuercas. El motor brushless entrega 285 Nm en un cuerpo liviano.',
+      features: [
+        'Torque de 285 Nm',
+        'Motor brushless',
+        'Dos baterías y cargador',
+        'Valija con accesorios',
+      ],
+      images: ['images/products/p16-1.jpg'],
       icon: 'driver',
       price: 190,
       oldPrice: 0,
@@ -282,8 +409,17 @@ window.FERROMAX = {
     },
     {
       id: 21,
-      code: 'FM1021',
+      code: 'FD1021',
       name: 'Tornillos autoperforantes 8 x 1" · caja x100',
+      description:
+        'Tornillos autoperforantes para fijar madera, chapa y perfiles metálicos. Caja de 100 unidades con punta Phillips y cabeza plana.',
+      features: [
+        'Medida 8 x 1 pulgada',
+        'Caja de 100 unidades',
+        'Punta Phillips',
+        'Acabado resistente a la corrosión',
+      ],
+      images: ['images/products/p21-1.jpg'],
       icon: 'screw',
       price: 12,
       oldPrice: 15,
@@ -294,8 +430,17 @@ window.FERROMAX = {
     },
     {
       id: 22,
-      code: 'FM1022',
+      code: 'FD1022',
       name: 'Candado de seguridad 50 mm con llave',
+      description:
+        'Candado de bronce de 50 mm para puertas, portones y armarios. Incluye tres llaves y arco reforzado.',
+      features: [
+        'Cuerpo de bronce de 50 mm',
+        'Tres llaves incluidas',
+        'Arco templado',
+        'Uso interior y exterior',
+      ],
+      images: ['images/products/p22-1.jpg'],
       icon: 'lock',
       price: 19,
       oldPrice: 24,
@@ -306,8 +451,17 @@ window.FERROMAX = {
     },
     {
       id: 23,
-      code: 'FM1023',
+      code: 'FD1023',
       name: 'Cargador rápido 42V con ventilación activa',
+      description:
+        'Cargador de 42V con ventilación activa para reducir la temperatura durante la carga. Compatible con las baterías de la línea 42V.',
+      features: [
+        'Carga rápida de 42V',
+        'Ventilación activa',
+        'Protección contra sobrecarga',
+        'Indicador de estado',
+      ],
+      images: ['images/products/p23-1.jpg'],
       icon: 'battery',
       price: 89,
       oldPrice: 0,
@@ -318,8 +472,17 @@ window.FERROMAX = {
     },
     {
       id: 24,
-      code: 'FM1024',
+      code: 'FD1024',
       name: 'Batería 42V 4.0Ah compacta',
+      description:
+        'Batería de iones de litio de 4.0Ah para las herramientas de la línea 42V. Formato compacto con indicador de carga integrado.',
+      features: [
+        'Capacidad de 4.0Ah',
+        'Voltaje 42V',
+        'Indicador de carga',
+        'Formato compacto',
+      ],
+      images: ['images/products/p24-1.jpg'],
       icon: 'battery',
       price: 149,
       oldPrice: 179,
@@ -330,8 +493,17 @@ window.FERROMAX = {
     },
     {
       id: 25,
-      code: 'FM1025',
+      code: 'FD1025',
       name: 'Hidrolavadora compacta 1400W 110 bar',
+      description:
+        'Hidrolavadora eléctrica de 1400W y 110 bar para limpieza de patios, vehículos y fachadas. Formato compacto con manguera y lanza.',
+      features: [
+        'Motor de 1400W',
+        'Presión de 110 bar',
+        'Manguera y lanza incluidas',
+        'Diseño compacto con ruedas',
+      ],
+      images: ['images/products/p25-1.jpg'],
       icon: 'spray',
       price: 189,
       oldPrice: 229,
@@ -342,8 +514,17 @@ window.FERROMAX = {
     },
     {
       id: 26,
-      code: 'FM1026',
+      code: 'FD1026',
       name: 'Compresor de aire 24L 1.5 HP',
+      description:
+        'Compresor de aire de 24 litros y 1.5 HP para inflado, pintura y herramientas neumáticas. Funcionamiento libre de aceite y bajo nivel de ruido.',
+      features: [
+        'Tanque de 24 litros',
+        'Potencia de 1.5 HP',
+        'Libre de aceite',
+        'Bajo nivel de ruido',
+      ],
+      images: ['images/products/p26-1.jpg'],
       icon: 'gear',
       price: 249,
       oldPrice: 0,
@@ -354,8 +535,17 @@ window.FERROMAX = {
     },
     {
       id: 27,
-      code: 'FM1027',
+      code: 'FD1027',
       name: 'Juego de destornilladores 6 piezas',
+      description:
+        'Juego de seis destornilladores aislados para trabajos eléctricos y de mantenimiento. Mangos ergonómicos y puntas planas y Phillips.',
+      features: [
+        'Seis destornilladores',
+        'Aislación para trabajo eléctrico',
+        'Puntas planas y Phillips',
+        'Mangos ergonómicos',
+      ],
+      images: ['images/products/p27-1.jpg', 'images/products/p27-2.jpg'],
       icon: 'driver',
       price: 34,
       oldPrice: 39,
@@ -366,8 +556,17 @@ window.FERROMAX = {
     },
     {
       id: 28,
-      code: 'FM1028',
+      code: 'FD1028',
       name: 'Nivel láser autonivelante 360°',
+      description:
+        'Nivel láser de tres líneas y 360 grados para replanteos y alineaciones. Se autonivela y permite trabajar sobre trípode o pared.',
+      features: [
+        'Cobertura de 360 grados',
+        'Autonivelante',
+        'Luz láser verde',
+        'Base magnética y rosca para trípode',
+      ],
+      images: ['images/products/p28-1.jpg'],
       icon: 'level',
       price: 79,
       oldPrice: 0,
@@ -378,8 +577,17 @@ window.FERROMAX = {
     },
     {
       id: 29,
-      code: 'FM1029',
+      code: 'FD1029',
       name: 'Fumigadora de mochila 16L',
+      description:
+        'Fumigadora manual de mochila con tanque de 16 litros para jardín y huerta. Incluye lanza ajustable y correas acolchadas.',
+      features: [
+        'Tanque de 16 litros',
+        'Lanza ajustable',
+        'Correas acolchadas',
+        'Bomba de presión manual',
+      ],
+      images: ['images/products/p29-1.jpg'],
       icon: 'spray',
       price: 69,
       oldPrice: 79,
@@ -390,8 +598,17 @@ window.FERROMAX = {
     },
     {
       id: 30,
-      code: 'FM1030',
+      code: 'FD1030',
       name: 'Guantes de trabajo reforzados',
+      description:
+        'Guantes de cuero y microfibra para tareas de taller, jardín y obra. Refuerzos en palma y dedos para mayor durabilidad.',
+      features: [
+        'Cuero y microfibra',
+        'Refuerzo en palma y dedos',
+        'Puño elástico',
+        'Talle XL',
+      ],
+      images: ['images/products/p30-1.jpg'],
       icon: 'sprout',
       price: 14,
       oldPrice: 0,
@@ -402,8 +619,17 @@ window.FERROMAX = {
     },
     {
       id: 31,
-      code: 'FM1031',
+      code: 'FD1031',
       name: 'Reflector LED 50W IP65',
+      description:
+        'Reflector LED de 50W para exteriores con protección IP65. Ilumina patios, galpones y accesos con bajo consumo.',
+      features: [
+        'Potencia de 50W',
+        'Protección IP65',
+        'Luz blanca de alta eficiencia',
+        'Soporte de montaje ajustable',
+      ],
+      images: ['images/products/p31-1.jpg'],
       icon: 'bulb',
       price: 29,
       oldPrice: 35,
@@ -414,8 +640,17 @@ window.FERROMAX = {
     },
     {
       id: 32,
-      code: 'FM1032',
+      code: 'FD1032',
       name: 'Lámpara portátil recargable 20W',
+      description:
+        'Lámpara de trabajo recargable con 20W de potencia y batería integrada. Se puede colgar o apoyar para iluminar talleres y obras.',
+      features: [
+        'Potencia de 20W',
+        'Batería recargable',
+        'Carcasa resistente',
+        'Soporte para colgar',
+      ],
+      images: ['images/products/p32-1.jpg'],
       icon: 'bulb',
       price: 39,
       oldPrice: 0,
@@ -426,8 +661,17 @@ window.FERROMAX = {
     },
     {
       id: 33,
-      code: 'FM1033',
+      code: 'FD1033',
       name: 'Cable bipolar 2 x 1.5 mm · rollo 100 m',
+      description:
+        'Rollo de cable bipolar de 2 x 1.5 mm para instalaciones eléctricas domiciliarias. Aislación flexible y conductores de cobre.',
+      features: [
+        'Rollo de 100 metros',
+        'Sección de 1.5 mm',
+        'Uso domiciliario',
+        'Conductores de cobre',
+      ],
+      images: ['images/products/p33-1.jpg'],
       icon: 'bolt',
       price: 58,
       oldPrice: 0,
@@ -438,8 +682,17 @@ window.FERROMAX = {
     },
     {
       id: 34,
-      code: 'FM1034',
+      code: 'FD1034',
       name: 'Zapatilla 6 tomas con interruptor',
+      description:
+        'Zapatilla de seis tomas con interruptor y cable flexible para escritorio, taller o living. Permite conectar varios equipos en un solo punto.',
+      features: [
+        'Seis tomas',
+        'Interruptor de encendido',
+        'Cable flexible',
+        'Uso interior',
+      ],
+      images: ['images/products/p34-1.jpg'],
       icon: 'bolt',
       price: 22,
       oldPrice: 26,
@@ -450,8 +703,17 @@ window.FERROMAX = {
     },
     {
       id: 35,
-      code: 'FM1035',
+      code: 'FD1035',
       name: 'Rodillo antigota 22 cm con mango ergonómico',
+      description:
+        'Rodillo antigota de 22 cm para pintar paredes y techos con látex. El mango ergonómico mejora el control en superficies amplias.',
+      features: [
+        'Ancho de 22 cm',
+        'Sistema antigota',
+        'Mango ergonómico',
+        'Apto para látex y esmalte',
+      ],
+      images: ['images/products/p35-1.jpg'],
       icon: 'roller',
       price: 12,
       oldPrice: 0,
@@ -462,8 +724,17 @@ window.FERROMAX = {
     },
     {
       id: 36,
-      code: 'FM1036',
+      code: 'FD1036',
       name: 'Aerosol sintético 400 ml blanco mate',
+      description:
+        'Pintura en aerosol de 400 ml con acabado blanco mate. Cubre y renueva superficies metálicas y de madera con secado rápido.',
+      features: [
+        'Contenido de 400 ml',
+        'Acabado blanco mate',
+        'Secado rápido',
+        'Uso interior y exterior',
+      ],
+      images: ['images/products/p36-1.jpg'],
       icon: 'spray',
       price: 9,
       oldPrice: 0,
@@ -474,8 +745,17 @@ window.FERROMAX = {
     },
     {
       id: 37,
-      code: 'FM1037',
+      code: 'FD1037',
       name: 'Manguera reforzada 1/2" x 25 m',
+      description:
+        'Manguera reforzada de 1/2 pulgada y 25 metros para riego y limpieza. Flexible, resistente a la intemperie y compatible con conectores estándar.',
+      features: [
+        'Largo de 25 metros',
+        'Diámetro de 1/2 pulgada',
+        'Refuerzo interno',
+        'Resistente a la intemperie',
+      ],
+      images: ['images/products/p37-1.jpg'],
       icon: 'hose',
       price: 27,
       oldPrice: 32,
@@ -486,8 +766,17 @@ window.FERROMAX = {
     },
     {
       id: 38,
-      code: 'FM1038',
+      code: 'FD1038',
       name: 'Tijera de podar profesional 8"',
+      description:
+        'Tijera de podar de 8 pulgadas con hojas de acero y mango ergonómico. Corta ramas y tallos con menos esfuerzo.',
+      features: [
+        'Hoja de acero',
+        'Largo de 8 pulgadas',
+        'Mango ergonómico',
+        'Cierre de seguridad',
+      ],
+      images: ['images/products/p38-1.jpg'],
       icon: 'sprout',
       price: 21,
       oldPrice: 0,

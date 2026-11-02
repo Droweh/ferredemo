@@ -1,4 +1,4 @@
-/* Acceso, registro y cambio de contraseña de FerroMax. */
+/* Acceso, registro y cambio de contraseña de FerreDemo. */
 (() => {
   'use strict';
 
@@ -452,7 +452,7 @@
       button.addEventListener('click', () => {
         const isAdmin = button.dataset.demo === 'admin';
         switchTab('login');
-        $('#login-email').value = isAdmin ? 'admin@ferromax.com' : 'cliente@ferromax.com';
+        $('#login-email').value = isAdmin ? 'admin@ferredemo.com' : 'cliente@ferredemo.com';
         $('#login-password').value = isAdmin ? 'Admin1234!' : 'Cliente1234!';
         showAlert(
           elements.authAlert,

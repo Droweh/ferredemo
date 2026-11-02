@@ -1,4 +1,4 @@
--- FerroMax · seguridad a nivel de fila (RLS)
+-- FerreDemo · seguridad a nivel de fila (RLS)
 -- Los clientes solo ven productos publicados y sus fotos. El admin ve y edita todo.
 
 alter table public.products enable row level security;

@@ -1,4 +1,4 @@
-/* Tema claro/oscuro de FerroMax.
+/* Tema claro/oscuro de FerreDemo.
    Sin preferencia guardada se sigue siempre al sistema. El switch fija una
    preferencia explícita y la conserva entre páginas y recargas. */
 (function () {

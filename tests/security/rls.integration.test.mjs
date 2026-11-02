@@ -60,7 +60,7 @@ function tempProduct(code) {
   };
 }
 
-describe('RLS de FerroMax (proyecto exclusivo de pruebas)', { skip: baseSkip }, () => {
+describe('RLS de FerreDemo (proyecto exclusivo de pruebas)', { skip: baseSkip }, () => {
   let anon;
 
   before(() => {

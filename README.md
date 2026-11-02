@@ -1,13 +1,15 @@
-# FerroMax · demo de ferretería
+# FerreDemo · demo de ferretería
 
-Sitio de demostración con catálogo, carrito, favoritos, cuentas y panel de administración. Está pensado para publicarse gratis con **GitHub Pages + Supabase Free + Cloudflare Turnstile**, sin servidor propio ni dominio.
+Sitio de demostración con catálogo, fichas de producto, carrito, favoritos, cuentas y panel de administración. Está pensado para publicarse gratis con **GitHub Pages + Supabase Free + Cloudflare Turnstile**, sin servidor propio ni dominio.
 
-La interfaz mantiene una estética industrial en naranja y carbón, con esquinas rectas, iconos SVG lineales y sin emojis.
+La interfaz mantiene una estética industrial en naranja y carbón, con esquinas rectas, iconos SVG lineales y sin emojis. Las fichas combinan fotos grandes, precio, stock, código, descripción y productos relacionados.
 
 **Demo publicada:** <https://droweh.github.io/ferromax-demo/>  
 **Repositorio:** <https://github.com/Droweh/ferromax-demo>
 
 La versión publicada funciona en modo local: los datos y las fotos se guardan en el navegador. Para activar cuentas y catálogo compartidos, configurá Supabase como se explica más abajo.
+
+Las fotos del catálogo son referencias de **DIT Ferretería** descargadas al proyecto y se usan solo para esta demo sin fines comerciales. No hay hotlinks ni afiliación con la marca.
 
 ## Puesta en marcha rápida
 
@@ -25,7 +27,8 @@ También podés ejecutar `configurar.bat` para generar la configuración local y
 
 ## Qué incluye
 
-- 9 categorías y 36 subcategorías con 32 productos.
+- 9 categorías y 36 subcategorías con 32 productos y códigos `FD1001–FD1038`.
+- Ficha de producto con galería ampliable, precio anterior, stock, código, descripción, características y relacionados.
 - Búsqueda, orden por precio/nombre, estados vacíos y diseño responsive.
 - Carrito y favoritos persistentes en el navegador.
 - Slider automático cada 5 segundos, con pausa al pasar el mouse y respeto por `prefers-reduced-motion`.
@@ -73,8 +76,8 @@ También sirve la extensión Live Server de VS Code apuntando a `public`.
 
 | Rol | Email | Contraseña |
 | --- | --- | --- |
-| Administrador | `admin@ferromax.com` | `Admin1234!` |
-| Cliente | `cliente@ferromax.com` | `Cliente1234!` |
+| Administrador | `admin@ferredemo.com` | `Admin1234!` |
+| Cliente | `cliente@ferredemo.com` | `Cliente1234!` |
 
 > Esas cuentas existen solo en el modo local. En Supabase hay que crear los usuarios desde Authentication > Users; las migraciones no los crean.
 
@@ -97,7 +100,7 @@ GitHub CLI es opcional. Si no lo tenés, instalalo desde [cli.github.com](https:
 
 ## Tema claro y oscuro
 
-Sin preferencia guardada, el sitio sigue siempre al sistema operativo mediante `prefers-color-scheme` y no escribe `data-theme` en el documento. Al usar el switch, se guarda `light` o `dark` en `localStorage` con la clave `ferromax.theme.v1`, se aplica `data-theme` en `<html>` y la elección se mantiene en las cuatro páginas y entre recargas.
+Sin preferencia guardada, el sitio sigue siempre al sistema operativo mediante `prefers-color-scheme` y no escribe `data-theme` en el documento. Al usar el switch, se guarda `light` o `dark` en `localStorage` con la clave `ferromax.theme.v1`, se aplica `data-theme` en `<html>` y la elección se mantiene en las cinco páginas y entre recargas.
 
 El switch es un control accesible con `role="switch"`, `aria-checked` y una etiqueta que cambia entre **Cambiar a modo oscuro** y **Cambiar a modo claro**.
 
@@ -121,7 +124,7 @@ En el **SQL Editor** de Supabase, ejecutá los archivos en este orden:
 4. `supabase/migrations/20261031000400_seed.sql`
 5. `supabase/migrations/20261031000500_reset.sql`
 
-El archivo de seed carga los 32 productos con los IDs originales y configura la secuencia para productos nuevos.
+El archivo de seed carga los 32 productos con los IDs originales, los códigos `FD` y las descripciones de la demo, y configura la secuencia para productos nuevos.
 
 También podés usar la CLI de Supabase si ya está instalada:
 
@@ -237,9 +240,9 @@ npm run test:all
 
 | Comando | Qué prueba |
 | --- | --- |
-| `npm run test:unit` | 9 categorías, 36 subcategorías, 32 productos y paridad entre `data.js` y el seed SQL. |
+| `npm run test:unit` | 9 categorías, 36 subcategorías, 32 productos, fotos locales y paridad entre `data.js` y el seed SQL. |
 | `npm run test:security` | Validación de fotos, detección de claves secretas, sesión local, RLS declarado y configuración pública. |
-| `npm run test:e2e` | Tienda, cuentas, panel, fotos, tema, XSS, accesibilidad y responsive en escritorio y móvil. |
+| `npm run test:e2e` | Tienda, fichas, galería, cuentas, panel, fotos, tema, XSS, accesibilidad y responsive en escritorio y móvil. |
 | `npm run test:security:rls` | Integración real contra un proyecto Supabase exclusivo de pruebas. |
 
 Las pruebas de navegador siempre fuerzan el modo local e interceptan `js/config.js`; además bloquean pedidos externos. Así nunca escriben en la demo pública ni necesitan credenciales de Supabase.
@@ -278,12 +281,15 @@ Supabase Free pausa un proyecto tras 7 días sin actividad. El workflow `.github
 ├─ public/
 │  ├─ index.html
 │  ├─ categoria.html
+│  ├─ producto.html
 │  ├─ cuenta.html
 │  ├─ admin.html
 │  ├─ css/
 │  │  ├─ styles.css
 │  │  ├─ auth.css
 │  │  └─ admin.css
+│  ├─ images/
+│  │  └─ products/          (33 fotos locales de la demo)
 │  └─ js/
 │     ├─ config.js          (generado, ignorado por Git)
 │     ├─ config.example.js
@@ -311,9 +317,9 @@ Supabase Free pausa un proyecto tras 7 días sin actividad. El workflow `.github
 
 ### Flujo de datos
 
-- `public/js/data.js`: categorías, subcategorías y los 32 productos semilla.
+- `public/js/data.js`: categorías, subcategorías y los 32 productos semilla con fotos locales.
 - `public/js/backend.js`: adaptador común para modo local y Supabase. Expone `getCatalog`, `getSession`, `signIn`, `signUp`, `signOut`, `updatePassword` y `admin.*`.
-- `public/js/app.js`: tienda, carrito y favoritos.
+- `public/js/app.js`: tienda, ficha de producto, galería, carrito y favoritos.
 - `public/js/auth.js`: ingreso, registro, Turnstile y cambio de contraseña.
 - `public/js/admin.js`: panel, fotos, papelera, historial y reset.
 - `public/js/theme.js`: tema del sistema, preferencia manual, switch y API pública.
@@ -366,4 +372,4 @@ Cerrá sesión y volvé a entrar. El JWT anterior conserva los roles viejos.
 
 Es una demo funcional sin backend propio, sin cobros y sin emails transaccionales. El checkout termina en un mensaje de demostración. La recuperación de contraseña por correo no está incluida a propósito para que todo el flujo funcione con Supabase Free y sin SMTP.
 
-Los datos de contacto y las marcas son ficticios y se usan solo para mostrar el diseño.
+Los datos de contacto y las marcas son ficticios y se usan solo para mostrar el diseño. Las fotos son referencias de DIT Ferretería para una demo sin fines comerciales; no existe relación con esa empresa.

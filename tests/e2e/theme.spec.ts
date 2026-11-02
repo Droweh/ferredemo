@@ -43,6 +43,10 @@ test.describe('Tema claro y oscuro', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect(page.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
 
+    await page.goto('/producto.html?id=27');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+
     await page.getByRole('switch').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect
@@ -69,8 +73,8 @@ test.describe('Tema claro y oscuro', () => {
       .toBeNull();
   });
 
-  test('el switch existe y responde en las cuatro páginas', async ({ page }) => {
-    const pages = ['/', '/categoria.html?cat=maquinas', '/cuenta.html'];
+  test('el switch existe y responde en las cinco páginas', async ({ page }) => {
+    const pages = ['/', '/categoria.html?cat=maquinas', '/producto.html?id=27', '/cuenta.html'];
 
     for (const path of pages) {
       await page.goto(path);

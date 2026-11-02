@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, test } from 'node:test';
-import { loadCatalogData } from './support/catalog.mjs';
+import { loadCatalogData, projectRoot } from './support/catalog.mjs';
 
 const data = loadCatalogData();
 const categories = data.categories;
@@ -26,7 +28,7 @@ const icons = new Set([
   'hose',
 ]);
 
-describe('Catálogo base de FerroMax', () => {
+describe('Catálogo base de FerreDemo', () => {
   test('conserva 9 categorías y 36 subcategorías', () => {
     assert.equal(categories.length, 9);
     const subcategories = categories.flatMap((category) => category.children);
@@ -70,7 +72,8 @@ describe('Catálogo base de FerroMax', () => {
     const names = new Set();
 
     for (const product of products) {
-      assert.match(product.code, /^FM\d{4}$/);
+      assert.match(product.code, /^FD\d{4}$/);
+      assert.equal(product.code, `FD${1000 + product.id}`, `Código fuera de la serie FD para el ID ${product.id}`);
       assert.ok(!codes.has(product.code), `Código duplicado: ${product.code}`);
       codes.add(product.code);
 
@@ -92,6 +95,45 @@ describe('Catálogo base de FerroMax', () => {
       );
       assert.ok(icons.has(product.icon), `Icono inválido en ${product.code}: ${product.icon}`);
     }
+  });
+
+  test('cada producto tiene descripción, características y fotos locales', () => {
+    const files = new Set();
+
+    for (const product of products) {
+      assert.ok(
+        typeof product.description === 'string' && product.description.trim().length >= 40,
+        `Descripción demasiado corta en ${product.code}`
+      );
+
+      assert.ok(Array.isArray(product.features), `Sin características en ${product.code}`);
+      assert.ok(
+        product.features.length >= 3 && product.features.length <= 5,
+        `Cantidad de características inválida en ${product.code}`
+      );
+      for (const feature of product.features) {
+        assert.ok(typeof feature === 'string' && feature.trim().length > 0, `Característica vacía en ${product.code}`);
+      }
+
+      assert.ok(Array.isArray(product.images), `Sin campo images en ${product.code}`);
+      assert.ok(
+        product.images.length >= 1 && product.images.length <= 2,
+        `Cantidad de fotos inválida en ${product.code}`
+      );
+      assert.equal(new Set(product.images).size, product.images.length, `Fotos repetidas en ${product.code}`);
+
+      for (const image of product.images) {
+        assert.match(image, /^images\/products\/p\d{2}-\d\.jpg$/, `Ruta de foto inválida en ${product.code}: ${image}`);
+        assert.ok(!/^https?:/.test(image), `La foto de ${product.code} no puede ser un hotlink`);
+        assert.ok(
+          existsSync(join(projectRoot, 'public', image)),
+          `Falta el archivo de la foto ${image} de ${product.code}`
+        );
+        files.add(image);
+      }
+    }
+
+    assert.equal(files.size, 33, 'La demo debe publicar las 33 fotos locales');
   });
 
   test('precios y disponibilidad son coherentes', () => {

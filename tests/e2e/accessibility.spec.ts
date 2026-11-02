@@ -26,6 +26,12 @@ test.describe('Accesibilidad', () => {
     expectNoViolations(await analyze(page));
   });
 
+  test('la ficha de producto no tiene violaciones WCAG A/AA', async ({ page }) => {
+    await page.goto('/producto.html?id=27');
+    await expect(page.locator('#product-name')).toHaveText('Juego de destornilladores 6 piezas');
+    expectNoViolations(await analyze(page));
+  });
+
   test('la cuenta no tiene violaciones WCAG A/AA', async ({ page }) => {
     await page.goto('/cuenta.html#ingresar');
     expectNoViolations(await analyze(page));

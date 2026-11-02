@@ -1,4 +1,4 @@
-/* Adaptador de datos y autenticación de FerroMax.
+/* Adaptador de datos y autenticación de FerreDemo.
    - Modo local: demo completa en el navegador (localStorage + IndexedDB).
    - Modo Supabase: Auth, Postgres y Storage reales.
    La interfaz de la tienda y del panel es la misma para ambos modos. */
@@ -13,7 +13,9 @@
     session: 'ferromax.demo.session.v1',
     products: 'ferromax.demo.products.v1',
     audit: 'ferromax.demo.audit.v1',
+    version: 'ferromax.demo.version.v1',
   };
+  const LOCAL_CATALOG_VERSION = 2;
 
   const IDB_NAME = 'ferromax-demo-images';
   const IDB_STORE = 'images';
@@ -23,8 +25,8 @@
   const SESSION_DAYS = 30;
 
   const DEMO_CREDENTIALS = [
-    { label: 'Administrador', email: 'admin@ferromax.com', password: 'Admin1234!' },
-    { label: 'Cliente', email: 'cliente@ferromax.com', password: 'Cliente1234!' },
+    { label: 'Administrador', email: 'admin@ferredemo.com', password: 'Admin1234!' },
+    { label: 'Cliente', email: 'cliente@ferredemo.com', password: 'Cliente1234!' },
   ];
 
   const supabaseUrl = String(CONFIG.supabaseUrl || '').trim();
@@ -632,22 +634,72 @@
   }
 
   /* Modo local ------------------------------------------------------------- */
+  function seedImageObjects(product) {
+    return (Array.isArray(product.images) ? product.images : []).map((path, index) => ({
+      id: `seed-${product.id}-${index + 1}`,
+      productId: Number(product.id),
+      path,
+      url: path,
+      alt: `${product.name} · foto ${index + 1}`,
+      sortOrder: index,
+      isCover: index === 0,
+    }));
+  }
+
   function seedProducts() {
     return DATA.products.map((product) => ({
       ...product,
       description: product.description || '',
+      features: Array.isArray(product.features) ? product.features.slice() : [],
       stock: product.inStock ? 10 : 0,
       status: 'published',
       deletedAt: null,
-      images: [],
+      images: seedImageObjects(product),
     }));
+  }
+
+  /* Los catálogos guardados antes de FerreDemo tienen códigos FM y fotos vacías.
+     Se migran una sola vez, sin pisar precios, stock ni fotos subidas por el admin. */
+  function migrateLocalProducts(products) {
+    const seedById = new Map(DATA.products.map((product) => [Number(product.id), product]));
+    let changed = false;
+
+    const migrated = products.map((product) => {
+      const seed = seedById.get(Number(product.id));
+      if (!seed) return product;
+
+      const updates = {};
+      const previousCode = seed.code.replace(/^FD/, 'FM');
+      if (product.code === previousCode) updates.code = seed.code;
+      if (!product.description && seed.description) updates.description = seed.description;
+      if (!Array.isArray(product.features) || product.features.length === 0) {
+        updates.features = Array.isArray(seed.features) ? seed.features.slice() : [];
+      }
+      if (!Array.isArray(product.images) || product.images.length === 0) {
+        updates.images = seedImageObjects(seed);
+      }
+
+      if (Object.keys(updates).length === 0) return product;
+      changed = true;
+      return { ...product, ...updates };
+    });
+
+    return { products: migrated, changed };
   }
 
   function readLocalProducts() {
     const saved = readStorage(LOCAL_KEYS.products);
-    if (Array.isArray(saved)) return saved;
+    if (Array.isArray(saved)) {
+      if (Number(readStorage(LOCAL_KEYS.version)) === LOCAL_CATALOG_VERSION) return saved;
+      const migration = migrateLocalProducts(saved);
+      writeStorage(LOCAL_KEYS.products, migration.products);
+      writeStorage(LOCAL_KEYS.version, LOCAL_CATALOG_VERSION);
+      return migration.products;
+    }
+
     const seeded = seedProducts();
     writeStorage(LOCAL_KEYS.products, seeded);
+    writeStorage(LOCAL_KEYS.version, LOCAL_CATALOG_VERSION);
     return seeded;
   }
 
@@ -664,10 +716,10 @@
       if (users.some((user) => normalizeText(user.email) === normalizeText(seed.email))) continue;
       const salt = uid();
       users.push({
-        id: `demo-${seed.email === 'admin@ferromax.com' ? 'admin' : 'client'}`,
+        id: `demo-${seed.email === 'admin@ferredemo.com' ? 'admin' : 'client'}`,
         email: seed.email,
-        name: seed.email === 'admin@ferromax.com' ? 'Admin FerroMax' : 'Cliente Demo',
-        role: seed.email === 'admin@ferromax.com' ? 'admin' : 'customer',
+        name: seed.email === 'admin@ferredemo.com' ? 'Admin FerreDemo' : 'Cliente Demo',
+        role: seed.email === 'admin@ferredemo.com' ? 'admin' : 'customer',
         salt,
         passwordHash: await hashPassword(seed.password, salt),
         createdAt: new Date().toISOString(),
@@ -739,10 +791,15 @@
         const order = (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0);
         return order !== 0 ? order : String(a.id).localeCompare(String(b.id));
       })
-      .map((image) => ({
-        ...image,
-        url: cache.get(image.path) || '',
-      }))
+      .map((image) => {
+        const path = String(image.path || '');
+        const cached = cache.get(path);
+        const staticPath = path && !path.startsWith('local:') ? path : '';
+        return {
+          ...image,
+          url: cached || staticPath || image.url || '',
+        };
+      })
       .filter((image) => image.url);
     return {
       ...product,
@@ -824,6 +881,7 @@
     const product = {
       id: nextId,
       ...normalized,
+      features: [],
       inStock: normalized.stock > 0,
       deletedAt: null,
       images: [],
@@ -1004,6 +1062,7 @@
 
   async function localResetDemo() {
     writeLocalProducts(seedProducts());
+    writeStorage(LOCAL_KEYS.version, LOCAL_CATALOG_VERSION);
     localAuditAdd({
       action: 'RESET_DEMO',
       entity: 'demo',

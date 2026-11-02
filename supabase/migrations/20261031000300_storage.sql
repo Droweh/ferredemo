@@ -1,4 +1,4 @@
--- FerroMax · bucket público de fotos de producto
+-- FerreDemo · bucket público de fotos de producto
 -- La lectura es pública; solo el admin puede subir, reemplazar o borrar archivos.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

@@ -90,7 +90,7 @@ const server = createServer((request, response) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`FerroMax test server en http://${host}:${port}/`);
+  console.log(`FerreDemo test server en http://${host}:${port}/`);
 });
 
 function shutdown() {

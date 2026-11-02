@@ -1,4 +1,4 @@
--- FerroMax · esquema base
+-- FerreDemo · esquema base
 -- Ejecutar en Supabase SQL Editor (o con Supabase CLI) antes que el resto.
 
 create extension if not exists pgcrypto;

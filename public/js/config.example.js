@@ -1,4 +1,4 @@
-/* Ejemplo de configuración de FerroMax.
+/* Ejemplo de configuración de FerreDemo.
    Copiá este archivo como js/config.js o ejecutá configurar.bat en Windows.
 
    - mode: "supabase" para usar Supabase; "local" fuerza la demo sin conexión.

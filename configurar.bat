@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title FerroMax - Configuracion
+title FerreDemo - Configuracion
 color 0F
 cls
 echo.

@@ -1,4 +1,4 @@
-﻿# FerroMax · configurador de la demo
+﻿# FerreDemo · configurador de la demo
 # Se ejecuta desde configurar.bat. Valida los datos, genera public/js/config.js
 # y, si GitHub CLI está disponible, carga los secretos del repositorio.
 
@@ -81,7 +81,7 @@ function Write-ConfigFile {
   $json = $config | ConvertTo-Json -Depth 4
   $stamp = Get-Date -Format 'yyyy-MM-dd HH:mm'
   $content = @"
-/* FerroMax · configuración generada por configurar.bat ($stamp).
+/* FerreDemo · configuración generada por configurar.bat ($stamp).
    Este archivo contiene solo datos públicos. Nunca pongas una service_role acá. */
 window.FERROMAX_CONFIG = $json;
 "@
@@ -283,8 +283,8 @@ try {
   if ($mode -eq 'local') {
     Write-Host ""
     Write-Host '  DEMO LOCAL LISTA' -ForegroundColor Cyan
-    Write-Host '  Admin:   admin@ferromax.com / Admin1234!' -ForegroundColor Gray
-    Write-Host '  Cliente: cliente@ferromax.com / Cliente1234!' -ForegroundColor Gray
+    Write-Host '  Admin:   admin@ferredemo.com / Admin1234!' -ForegroundColor Gray
+    Write-Host '  Cliente: cliente@ferredemo.com / Cliente1234!' -ForegroundColor Gray
     Write-Host '  Abrí index.html con un servidor local para probar.' -ForegroundColor Gray
     Write-Host '  Para publicar en GitHub Pages, volvé a ejecutar en modo Supabase.' -ForegroundColor Gray
   } else {

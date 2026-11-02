@@ -17,7 +17,7 @@ test.describe('Panel de administración', () => {
     await expect(dialog).toBeVisible();
     await expect(page.locator('#product-dialog-title')).toHaveText('Nuevo producto');
 
-    await page.fill('#product-code', 'FM9001');
+    await page.fill('#product-code', 'FD9001');
     await page.fill('#product-name', 'Taladro de prueba con foto');
     await page.selectOption('#product-category', 'maquinas');
     await page.selectOption('#product-subcategory', 'taladros');
@@ -38,15 +38,15 @@ test.describe('Panel de administración', () => {
     await expect(dialog).toBeHidden();
     await expect(page.locator('#toast')).toContainText('Producto creado con fotos');
 
-    await page.fill('#admin-search', 'FM9001');
-    const row = page.locator('#products-body tr[data-product-id]', { hasText: 'FM9001' });
+    await page.fill('#admin-search', 'FD9001');
+    const row = page.locator('#products-body tr[data-product-id]', { hasText: 'FD9001' });
     await expect(row).toBeVisible();
     await expect(row).toContainText('Taladro de prueba con foto');
     await expect(row).toContainText('1/5');
     await expect(row).toContainText('USD 199,9');
 
     await page.goto('/');
-    const card = page.locator('#grid-nuevos .product-card', { hasText: 'FM9001' });
+    const card = page.locator('#grid-nuevos .product-card', { hasText: 'FD9001' });
     await expect(card).toBeVisible();
     await expect(card).toContainText('Taladro de prueba con foto');
     await expect(card.locator('.product-card__photo')).toHaveAttribute(
@@ -57,8 +57,8 @@ test.describe('Panel de administración', () => {
 
     await page.goto('/admin.html');
     await expect(page.locator('#admin-shell')).toBeVisible();
-    await page.fill('#admin-search', 'FM9001');
-    const persisted = page.locator('#products-body tr[data-product-id]', { hasText: 'FM9001' });
+    await page.fill('#admin-search', 'FD9001');
+    const persisted = page.locator('#products-body tr[data-product-id]', { hasText: 'FD9001' });
     await expect(persisted).toContainText('1/5');
   });
 
@@ -79,7 +79,7 @@ test.describe('Panel de administración', () => {
     await expect(row.locator('.admin-stock')).toHaveClass(/is-out/);
 
     await page.goto('/');
-    const card = page.locator('#grid-combos .product-card', { hasText: 'FM1001' });
+    const card = page.locator('#grid-combos .product-card', { hasText: 'FD1001' });
     await expect(card).toContainText('USD 700');
     await expect(card).toContainText('Agotado');
     await expect(card.getByRole('button', { name: 'Agregar al carrito' })).toBeDisabled();
@@ -87,7 +87,7 @@ test.describe('Panel de administración', () => {
 
   test('oculta y vuelve a publicar un producto', async ({ page }) => {
     await loginAsAdmin(page);
-    await page.fill('#admin-search', 'FM1011');
+    await page.fill('#admin-search', 'FD1011');
     const row = page.locator('#products-body tr[data-product-id="11"]');
     await expect(row).toBeVisible();
     await expect(row.locator('.admin-status')).toHaveText('Publicado');
@@ -97,7 +97,7 @@ test.describe('Panel de administración', () => {
     await expect(row.locator('.admin-status')).toHaveText('Oculto');
 
     await page.goto('/');
-    await expect(page.locator('#grid-nuevos .product-card', { hasText: 'FM1011' })).toHaveCount(0);
+    await expect(page.locator('#grid-nuevos .product-card', { hasText: 'FD1011' })).toHaveCount(0);
 
     await page.goto('/admin.html');
     await expect(page.locator('#admin-shell')).toBeVisible();
@@ -108,12 +108,12 @@ test.describe('Panel de administración', () => {
     await expect(hiddenRow.locator('.admin-status')).toHaveText('Publicado');
 
     await page.goto('/');
-    await expect(page.locator('#grid-nuevos .product-card', { hasText: 'FM1011' })).toHaveCount(1);
+    await expect(page.locator('#grid-nuevos .product-card', { hasText: 'FD1011' })).toHaveCount(1);
   });
 
   test('envía a la papelera, restaura y conserva la búsqueda', async ({ page }) => {
     await loginAsAdmin(page);
-    await page.fill('#admin-search', 'FM1001');
+    await page.fill('#admin-search', 'FD1001');
     const row = page.locator('#products-body tr[data-product-id="1"]');
     await expect(row).toBeVisible();
 
@@ -127,7 +127,7 @@ test.describe('Panel de administración', () => {
     await expect(page.locator('#trash-view')).toBeVisible();
     const trashRow = page.locator('#trash-body tr[data-product-id="1"]');
     await expect(trashRow).toBeVisible();
-    await expect(trashRow).toContainText('FM1001');
+    await expect(trashRow).toContainText('FD1001');
     await trashRow.locator('[data-row-action="restore"]').click();
     await expect(page.locator('#toast')).toContainText('Producto restaurado');
     await expect(page.locator('#tab-trash-count')).toHaveText('0');
@@ -155,7 +155,7 @@ test.describe('Panel de administración', () => {
     await loginAsAdmin(page);
     await page.evaluate(async () => {
       await window.FerroMaxBackend.admin.saveProduct(null, {
-        code: 'FMRESET1',
+        code: 'FDRESET1',
         name: 'Producto a borrar con el reset',
         category: 'herramientas',
         subcategory: null,
@@ -171,7 +171,7 @@ test.describe('Panel de administración', () => {
     await page.reload();
     await expect(page.locator('#admin-shell')).toBeVisible();
     await expect(page.locator('#stat-total')).toHaveText('33');
-    await page.fill('#admin-search', 'FMRESET1');
+    await page.fill('#admin-search', 'FDRESET1');
     await expect(page.locator('#products-body tr[data-product-id]')).toHaveCount(1);
 
     await page.getByRole('button', { name: 'Restaurar demo' }).click();

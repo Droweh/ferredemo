@@ -2,7 +2,7 @@
   "name": "ferromax-demo",
   "version": "1.0.0",
   "private": true,
-  "description": "Demo de ferretería FerroMax: tienda, cuentas y panel de administración.",
+  "description": "Demo de ferretería FerreDemo: tienda, fichas de producto, cuentas y panel de administración.",
   "type": "module",
   "scripts": {
     "serve": "node scripts/serve-public.mjs",

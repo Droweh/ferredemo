@@ -1,12 +1,12 @@
 import { expect, type Page } from '@playwright/test';
 
 export const ADMIN = {
-  email: 'admin@ferromax.com',
+  email: 'admin@ferredemo.com',
   password: 'Admin1234!',
 };
 
 export const CLIENT = {
-  email: 'cliente@ferromax.com',
+  email: 'cliente@ferredemo.com',
   password: 'Cliente1234!',
 };
 
@@ -14,7 +14,7 @@ export const CLIENT = {
 export const PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2n0kAAAAASUVORK5CYII=';
 
-export const pngFile = (name = 'foto-ferromax.png') => ({
+export const pngFile = (name = 'foto-ferredemo.png') => ({
   name,
   mimeType: 'image/png',
   buffer: Buffer.from(PNG_BASE64, 'base64'),

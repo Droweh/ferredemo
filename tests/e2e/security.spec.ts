@@ -2,13 +2,13 @@ import { expect, test } from './support/fixtures';
 import { loginAsAdmin, openAdminProduct, pngFile } from './support/helpers';
 
 test.describe('Seguridad del navegador', () => {
-  test('escapa nombres de producto maliciosos en panel y catálogo', async ({ page }) => {
+  test('escapa nombres de producto maliciosos en panel, catálogo y ficha', async ({ page }) => {
     await loginAsAdmin(page);
     const malicious = '<img src=x onerror="window.__ferromaxXss=1">Producto XSS';
 
     await page.evaluate(async (name) => {
       await window.FerroMaxBackend.admin.saveProduct(null, {
-        code: 'FMXSS1',
+        code: 'FDXSS1',
         name,
         category: 'herramientas',
         subcategory: null,
@@ -24,19 +24,28 @@ test.describe('Seguridad del navegador', () => {
 
     await page.reload();
     await expect(page.locator('#admin-shell')).toBeVisible();
-    await page.fill('#admin-search', 'FMXSS1');
-    const row = page.locator('#products-body tr[data-product-id]', { hasText: 'FMXSS1' });
+    await page.fill('#admin-search', 'FDXSS1');
+    const row = page.locator('#products-body tr[data-product-id]', { hasText: 'FDXSS1' });
     await expect(row).toBeVisible();
     await expect(row.locator('.admin-product__name')).toHaveText(malicious);
     await expect(row.locator('img[src="x"]')).toHaveCount(0);
     expect(await page.evaluate(() => window.__ferromaxXss)).toBeUndefined();
+    const productId = await row.getAttribute('data-product-id');
+    expect(productId).toBeTruthy();
 
-    await page.goto('/categoria.html?cat=herramientas&q=FMXSS1');
-    const card = page.locator('#category-grid .product-card', { hasText: 'FMXSS1' });
+    await page.goto('/categoria.html?cat=herramientas&q=FDXSS1');
+    const card = page.locator('#category-grid .product-card', { hasText: 'FDXSS1' });
     await expect(card).toBeVisible();
     await expect(card.locator('.product-card__name')).toHaveText(malicious);
     await expect(card.locator('img[src="x"]')).toHaveCount(0);
     await expect(card.locator('script')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__ferromaxXss)).toBeUndefined();
+
+    await page.goto(`/producto.html?id=${productId}`);
+    await expect(page.locator('#product-name')).toHaveText(malicious);
+    await expect(page.locator('#product-description')).toContainText('<script>');
+    await expect(page.locator('#product-description script')).toHaveCount(0);
+    await expect(page.locator('#product-content img[src="x"]')).toHaveCount(0);
     expect(await page.evaluate(() => window.__ferromaxXss)).toBeUndefined();
   });
 
@@ -44,7 +53,8 @@ test.describe('Seguridad del navegador', () => {
     await loginAsAdmin(page);
     await openAdminProduct(page, 1);
     const alert = page.locator('#editor-alert');
-    await expect(page.locator('#editor-photos .editor-photo')).toHaveCount(0);
+    await expect(page.locator('#editor-photos .editor-photo')).toHaveCount(1);
+    await expect(page.locator('#editor-photos .editor-photo--pending')).toHaveCount(0);
 
     await page.setInputFiles('#photo-input', {
       name: 'archivo-peligroso.svg',
@@ -53,7 +63,7 @@ test.describe('Seguridad del navegador', () => {
     });
     await expect(alert).toBeVisible();
     await expect(alert).toContainText('La foto tiene que ser JPG, PNG o WebP.');
-    await expect(page.locator('#editor-photos .editor-photo')).toHaveCount(0);
+    await expect(page.locator('#editor-photos .editor-photo--pending')).toHaveCount(0);
 
     await page.setInputFiles('#photo-input', {
       name: 'foto-gigante.png',
@@ -61,7 +71,7 @@ test.describe('Seguridad del navegador', () => {
       buffer: Buffer.alloc(5 * 1024 * 1024 + 1, 0),
     });
     await expect(alert).toContainText('Cada foto puede pesar como máximo 5 MB.');
-    await expect(page.locator('#editor-photos .editor-photo')).toHaveCount(0);
+    await expect(page.locator('#editor-photos .editor-photo--pending')).toHaveCount(0);
   });
 
   test('limita a cinco fotos pendientes antes de guardar', async ({ page }) => {

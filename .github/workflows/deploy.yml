@@ -121,7 +121,7 @@ jobs:
             `/* Generado por GitHub Actions. */\nwindow.FERROMAX_CONFIG = ${JSON.stringify(config, null, 2)};\n`,
             'utf8'
           );
-          console.log(`FerroMax configurado en modo ${config.mode}.`);
+          console.log(`FerreDemo configurado en modo ${config.mode}.`);
           NODE
 
       - name: Configurar Pages

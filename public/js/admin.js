@@ -1,4 +1,4 @@
-/* Panel de administración de FerroMax: catálogo, stock, precios, fotos,
+/* Panel de administración de FerreDemo: catálogo, stock, precios, fotos,
    papelera, historial y restauración de la demo. */
 (() => {
   'use strict';
@@ -255,11 +255,11 @@
     if (kind === 'login') {
       elements.gateKicker.textContent = 'Acceso restringido';
       elements.gateTitle.textContent = 'Necesitás iniciar sesión';
-      elements.gateText.textContent = 'El panel solo está disponible para la cuenta administradora de FerroMax.';
+      elements.gateText.textContent = 'El panel solo está disponible para la cuenta administradora de FerreDemo.';
       elements.gateLogin.href = 'cuenta.html#ingresar';
       elements.gateLogin.textContent = 'Iniciar sesión';
       elements.gateNote.textContent = isLocal
-        ? 'Demo local: admin@ferromax.com / Admin1234!'
+        ? 'Demo local: admin@ferredemo.com / Admin1234!'
         : 'Ingresá con la cuenta que tiene el rol admin en app_metadata.';
       if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = !isLocal;
     } else if (kind === 'denied') {
@@ -269,7 +269,7 @@
       elements.gateLogin.href = 'cuenta.html';
       elements.gateLogin.textContent = 'Ir a mi cuenta';
       elements.gateNote.textContent = isLocal
-        ? 'Usá “Entrar como admin demo” o las credenciales admin@ferromax.com / Admin1234!'
+        ? 'Usá “Entrar como admin demo” o las credenciales admin@ferredemo.com / Admin1234!'
         : 'El rol se asigna en Supabase (app_metadata). Cerrá sesión y volvé a entrar después de asignarlo.';
       if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = !isLocal;
     } else {
@@ -1288,7 +1288,7 @@
         elements.gateDemoLogin.disabled = true;
         elements.gateDemoLogin.textContent = 'Entrando…';
         try {
-          await backend.signIn({ email: 'admin@ferromax.com', password: 'Admin1234!' });
+          await backend.signIn({ email: 'admin@ferredemo.com', password: 'Admin1234!' });
           await checkAccess();
         } catch (error) {
           showGate('login');

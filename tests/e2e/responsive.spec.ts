@@ -42,6 +42,27 @@ test.describe('Diseño responsive', () => {
     await expect(page.locator('#category-grid .product-card').first()).toBeVisible();
   });
 
+  test('la ficha móvil no desborda y la galería sigue siendo usable', async ({ page }) => {
+    await page.goto('/producto.html?id=27');
+    await expect(page.locator('#product-gallery-image')).toBeVisible();
+    await expectNoPageOverflow(page);
+
+    await page.locator('.product-gallery__thumb').nth(1).click();
+    await expect(page.locator('#product-gallery-counter')).toHaveText('02 / 02');
+
+    await page.locator('#product-gallery-main').click();
+    await expect(page.locator('#product-lightbox')).toBeVisible();
+    await expectNoPageOverflow(page);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#product-lightbox')).toBeHidden();
+
+    const add = page.locator('#product-add');
+    await expect(add).toBeVisible();
+    const box = await add.boundingBox();
+    const viewport = page.viewportSize();
+    if (box && viewport) expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+  });
+
   test('el carrito ocupa el ancho disponible sin desbordar', async ({ page }) => {
     await page.goto('/');
     await page.locator('#grid-combos .product-card').first().waitFor();

@@ -32,8 +32,11 @@ function jwt(payload) {
   return `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode(payload)}.firma-de-prueba`;
 }
 
-async function loadBackend(config) {
+async function loadBackend(config, initialStorage = {}) {
   const localStorage = createStorage();
+  for (const [key, value] of Object.entries(initialStorage)) {
+    localStorage.setItem(key, value);
+  }
   const window = {
     FERROMAX_CONFIG: config,
     FERROMAX: catalog,
@@ -133,6 +136,43 @@ describe('Detección de claves secretas en la configuración', () => {
   });
 });
 
+describe('Migración del catálogo local', () => {
+  test('actualiza códigos FM, descripciones y fotos sin pisar precios ni stock', async () => {
+    const oldProducts = catalog.products.map((product) => ({
+      ...product,
+      code: product.code.replace(/^FD/, 'FM'),
+      description: '',
+      features: [],
+      images: [],
+      price: product.price + 1,
+      stock: product.inStock ? 3 : 0,
+      status: 'published',
+      deletedAt: null,
+    }));
+
+    const { window, localStorage } = await loadBackend(
+      { mode: 'local', supabaseUrl: '', supabaseAnonKey: '', turnstileSiteKey: '' },
+      { 'ferromax.demo.products.v1': JSON.stringify(oldProducts) }
+    );
+
+    const result = await window.FerroMaxBackend.getCatalog();
+    const first = result.products.find((product) => Number(product.id) === 1);
+    const outOfStock = result.products.find((product) => Number(product.id) === 4);
+    assert.ok(first);
+    assert.equal(first.code, 'FD1001');
+    assert.ok(first.description.length > 40);
+    assert.equal(first.features.length, 4);
+    assert.equal(first.images.length, 1);
+    assert.equal(first.images[0].url, 'images/products/p01-1.jpg');
+    assert.equal(first.price, catalog.products[0].price + 1);
+    assert.equal(first.inStock, true);
+    assert.equal(outOfStock.code, 'FD1004');
+    assert.equal(outOfStock.inStock, false);
+    assert.equal(result.products.length, 32);
+    assert.equal(localStorage.getItem('ferromax.demo.version.v1'), '2');
+  });
+});
+
 describe('Sesión local', () => {
   test('crea las cuentas demo con hash y sin contraseñas en claro', async () => {
     const { localStorage } = await loadBackend({
@@ -150,7 +190,7 @@ describe('Sesión local', () => {
       assert.equal(user.password, undefined);
       assert.doesNotMatch(JSON.stringify(user), /Admin1234!|Cliente1234!/);
     }
-    const admin = users.find((user) => user.email === 'admin@ferromax.com');
+    const admin = users.find((user) => user.email === 'admin@ferredemo.com');
     assert.equal(admin.role, 'admin');
   });
 
@@ -162,7 +202,7 @@ describe('Sesión local', () => {
       turnstileSiteKey: '',
     });
     const users = JSON.parse(localStorage.getItem('ferromax.demo.users.v1'));
-    const admin = users.find((user) => user.email === 'admin@ferromax.com');
+    const admin = users.find((user) => user.email === 'admin@ferredemo.com');
     localStorage.setItem(
       'ferromax.demo.session.v1',
       JSON.stringify({ userId: admin.id, expiresAt: Date.now() - 1000 })
