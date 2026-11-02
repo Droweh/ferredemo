@@ -19,6 +19,7 @@
   const IDB_STORE = 'images';
   const MAX_IMAGES = 5;
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
   const SESSION_DAYS = 30;
 
   const DEMO_CREDENTIALS = [
@@ -38,10 +39,21 @@
   let client = null;
   let initError = null;
   let imageCache = null;
+  let imageCachePromise = null;
   let dbPromise = null;
   const authListeners = new Set();
 
   const normalizeText = (value) => String(value || '').trim().toLowerCase();
+
+  function validateImageFile(file) {
+    if (!file) return 'Elegí una foto para subir.';
+    if (!ALLOWED_IMAGE_TYPES.has(String(file.type || '').toLowerCase())) {
+      return 'La foto tiene que ser JPG, PNG o WebP.';
+    }
+    if (!file.size) return 'La foto está vacía o dañada.';
+    if (file.size > MAX_FILE_SIZE) return 'Cada foto puede pesar como máximo 5 MB.';
+    return '';
+  }
 
   function isSecretKey(value) {
     const key = String(value || '').trim();
@@ -594,17 +606,29 @@
   }
 
   async function loadImageCache(force = false) {
-    if (imageCache && !force) return imageCache;
-    imageCache = new Map();
-    try {
-      const rows = await imageDbGetAll();
-      rows.forEach((row) => {
-        if (row.id && row.dataUrl) imageCache.set(`local:${row.id}`, row.dataUrl);
-      });
-    } catch (error) {
-      imageCache = new Map();
+    if (force) {
+      imageCache = null;
+      imageCachePromise = null;
     }
-    return imageCache;
+    if (imageCache) return imageCache;
+    if (imageCachePromise) return imageCachePromise;
+
+    imageCachePromise = (async () => {
+      const cache = new Map();
+      try {
+        const rows = await imageDbGetAll();
+        rows.forEach((row) => {
+          if (row.id && row.dataUrl) cache.set(`local:${row.id}`, row.dataUrl);
+        });
+      } catch (error) {
+        /* Sin IndexedDB la demo sigue funcionando, solo sin fotos locales. */
+      }
+      imageCache = cache;
+      imageCachePromise = null;
+      return cache;
+    })();
+
+    return imageCachePromise;
   }
 
   /* Modo local ------------------------------------------------------------- */
@@ -1060,31 +1084,46 @@
 
   /* Compresión de imágenes -------------------------------------------------- */
   async function compressImage(file) {
-    if (!file || !String(file.type || '').startsWith('image/')) {
-      throw new Error('El archivo tiene que ser una imagen JPG, PNG o WebP.');
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      throw new Error('Cada foto puede pesar como máximo 5 MB.');
+    const fileError = validateImageFile(file);
+    if (fileError) throw new Error(fileError);
+
+    let source;
+    try {
+      source = await createImageBitmap(file);
+    } catch (error) {
+      source = await new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file);
+        const image = new Image();
+        image.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve(image);
+        };
+        image.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('No pudimos leer la imagen. Probá con otro archivo.'));
+        };
+        image.src = objectUrl;
+      });
     }
 
-    let bitmap;
-    try {
-      bitmap = await createImageBitmap(file);
-    } catch (error) {
+    const sourceWidth = Number(source.width || source.naturalWidth || 0);
+    const sourceHeight = Number(source.height || source.naturalHeight || 0);
+    if (!sourceWidth || !sourceHeight) {
+      if (typeof source.close === 'function') source.close();
       throw new Error('No pudimos leer la imagen. Probá con otro archivo.');
     }
 
     const maxSize = 1200;
-    const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
-    const width = Math.max(1, Math.round(bitmap.width * scale));
-    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const scale = Math.min(1, maxSize / Math.max(sourceWidth, sourceHeight));
+    const width = Math.max(1, Math.round(sourceWidth * scale));
+    const height = Math.max(1, Math.round(sourceHeight * scale));
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext('2d');
     if (!context) throw new Error('No pudimos procesar la imagen.');
-    context.drawImage(bitmap, 0, 0, width, height);
-    if (typeof bitmap.close === 'function') bitmap.close();
+    context.drawImage(source, 0, 0, width, height);
+    if (typeof source.close === 'function') source.close();
 
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.8));
     if (!blob) throw new Error('No pudimos comprimir la imagen.');
@@ -1123,6 +1162,8 @@
     config: CONFIG,
     demoCredentials: mode === 'local' ? DEMO_CREDENTIALS : [],
     maxImages: MAX_IMAGES,
+    maxFileSize: MAX_FILE_SIZE,
+    validateImageFile,
     ready,
     getSetupStatus() {
       return {
@@ -1132,7 +1173,8 @@
         error: initError ? initError.message : '',
       };
     },
-    getCatalog() {
+    async getCatalog() {
+      await ready;
       return mode === 'local' ? localGetCatalog() : supabaseGetCatalog();
     },
     getSession,

@@ -337,7 +337,7 @@
       if (user) {
         const firstName = String(user.name || user.email || 'Mi cuenta').split(/\s+/)[0];
         if (label) label.textContent = firstName;
-        accountButton.setAttribute('aria-label', `Mi cuenta: ${user.email}`);
+        accountButton.setAttribute('aria-label', `Mi cuenta: ${user.name || user.email}`);
         accountButton.classList.add('is-signed-in');
       } else {
         if (label) label.textContent = 'Ingresar';
@@ -608,14 +608,14 @@
     const categoryProducts = state.products.filter((product) => product.category === category.id);
     const allActive = !subcategory;
     const items = [
-      `<li><a class="subcategory-link${allActive ? ' is-active' : ''}" href="${categoryHref(category)}" aria-label="Todas: ${pluralize(categoryProducts.length, 'producto', 'productos')}"${allActive ? ' aria-current="page"' : ''}><span>Todas</span><span class="subcategory-link__count">${categoryProducts.length}</span></a></li>`,
+      `<li><a class="subcategory-link${allActive ? ' is-active' : ''}" href="${categoryHref(category)}"${allActive ? ' aria-current="page"' : ''}><span>Todas</span><span class="subcategory-link__count">${categoryProducts.length}</span><span class="sr-only"> productos</span></a></li>`,
     ];
 
     category.children.forEach((child) => {
       const count = categoryProducts.filter((product) => product.subcategory === child.id).length;
       const active = subcategory && subcategory.id === child.id;
       items.push(
-        `<li><a class="subcategory-link${active ? ' is-active' : ''}" href="${subcategoryHref(category, child)}" aria-label="${escapeHtml(child.name)}: ${pluralize(count, 'producto', 'productos')}"${active ? ' aria-current="page"' : ''}><span>${escapeHtml(child.name)}</span><span class="subcategory-link__count">${count}</span></a></li>`
+        `<li><a class="subcategory-link${active ? ' is-active' : ''}" href="${subcategoryHref(category, child)}"${active ? ' aria-current="page"' : ''}><span>${escapeHtml(child.name)}</span><span class="subcategory-link__count">${count}</span><span class="sr-only"> productos</span></a></li>`
       );
     });
 

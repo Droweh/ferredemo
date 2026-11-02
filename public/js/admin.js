@@ -84,7 +84,7 @@
     photoInput: $('#photo-input'),
     editorPhotos: $('#editor-photos'),
     editorPhotosNote: $('#editor-photos-note'),
-    editorUploadLabel: $('#editor-upload-label'),
+    editorUploadButton: $('#editor-upload-button'),
     saveProduct: $('#save-product'),
     confirmDialog: $('#confirm-dialog'),
     confirmTitle: $('#confirm-title'),
@@ -101,6 +101,7 @@
     view: 'products',
     editingId: null,
     editorProduct: null,
+    pendingPhotos: [],
     search: '',
     statusFilter: 'all',
     busy: false,
@@ -136,6 +137,13 @@
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
+
+  const photoUid = () => {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+    return `photo-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  };
 
   const activeProducts = () => state.products.filter((product) => !product.deletedAt);
   const trashedProducts = () => state.products.filter((product) => product.deletedAt);
@@ -653,12 +661,24 @@
     return `FM${max + 1}`;
   }
 
+  function clearPendingPhotos() {
+    state.pendingPhotos.forEach((photo) => {
+      try {
+        URL.revokeObjectURL(photo.url);
+      } catch (error) {
+        // El navegador puede haber liberado ya la URL.
+      }
+    });
+    state.pendingPhotos = [];
+  }
+
   function resetProductForm() {
     elements.productForm.reset();
     hideEditorAlert();
+    clearPendingPhotos();
     if (elements.photoInput) elements.photoInput.value = '';
     if (elements.editorPhotos) elements.editorPhotos.innerHTML = '';
-    if (elements.editorPhotosNote) elements.editorPhotosNote.textContent = 'Guardá el producto para poder agregar fotos.';
+    if (elements.editorPhotosNote) elements.editorPhotosNote.textContent = 'Podés agregar hasta 5 fotos. Se subirán al guardar.';
     if (elements.productSubcategory) elements.productSubcategory.innerHTML = '<option value="">Sin subcategoría</option>';
   }
 
@@ -716,40 +736,60 @@
     if (!elements.editorPhotos) return;
     const editing = Boolean(product && product.id);
     const images = editing && Array.isArray(product.images) ? product.images : [];
+    const pending = editing ? [] : state.pendingPhotos;
+    const total = images.length + pending.length;
+    const atLimit = total >= maxImages;
 
-    if (!editing) {
-      elements.editorPhotos.innerHTML = '';
-      if (elements.editorPhotosNote) elements.editorPhotosNote.textContent = 'Guardá el producto para poder agregar fotos.';
-      if (elements.editorUploadLabel) elements.editorUploadLabel.classList.add('is-disabled');
-      if (elements.photoInput) elements.photoInput.disabled = true;
-      return;
+    if (elements.photoInput) elements.photoInput.disabled = false;
+    if (elements.editorUploadButton) {
+      elements.editorUploadButton.disabled = atLimit;
+      elements.editorUploadButton.classList.toggle('is-disabled', atLimit);
+      elements.editorUploadButton.setAttribute('aria-disabled', String(atLimit));
+      elements.editorUploadButton.title = atLimit
+        ? `Máximo ${maxImages} fotos por producto`
+        : 'Agregar fotos';
     }
 
-    if (elements.photoInput) elements.photoInput.disabled = images.length >= maxImages;
-    if (elements.editorUploadLabel) {
-      elements.editorUploadLabel.classList.toggle('is-disabled', images.length >= maxImages);
-    }
     if (elements.editorPhotosNote) {
-      elements.editorPhotosNote.textContent = images.length
-        ? `${images.length} de ${maxImages} fotos. La foto marcada como portada es la que se muestra en el catálogo.`
-        : 'Todavía no hay fotos. La tarjeta usará el icono del producto.';
+      if (editing) {
+        elements.editorPhotosNote.textContent = images.length
+          ? `${images.length} de ${maxImages} fotos. La foto marcada como portada es la que se muestra en el catálogo.`
+          : 'Todavía no hay fotos. La tarjeta usará el icono del producto.';
+      } else {
+        elements.editorPhotosNote.textContent = pending.length
+          ? `${pending.length} de ${maxImages} fotos listas. La primera será la portada y se subirán al guardar.`
+          : `Podés agregar hasta ${maxImages} fotos. Se subirán al guardar.`;
+      }
     }
 
-    elements.editorPhotos.innerHTML = images
-      .map(
-        (image, index) => `
-          <article class="editor-photo" data-image-id="${escapeHtml(image.id)}">
-            <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || product.name)}" loading="lazy" decoding="async">
-            ${image.isCover ? '<span class="editor-photo__cover">Portada</span>' : ''}
-            <div class="editor-photo__actions">
-              <button type="button" data-photo-action="cover" data-image-id="${escapeHtml(image.id)}" title="Usar como portada" aria-label="Usar foto ${index + 1} como portada" ${image.isCover ? 'disabled' : ''}>${icon('star')}</button>
-              <button type="button" data-photo-action="left" data-image-id="${escapeHtml(image.id)}" title="Mover a la izquierda" aria-label="Mover foto ${index + 1} a la izquierda" ${index === 0 ? 'disabled' : ''}>${icon('chevron-left')}</button>
-              <button type="button" data-photo-action="right" data-image-id="${escapeHtml(image.id)}" title="Mover a la derecha" aria-label="Mover foto ${index + 1} a la derecha" ${index === images.length - 1 ? 'disabled' : ''}>${icon('chevron-right')}</button>
-              <button type="button" data-photo-action="delete" data-image-id="${escapeHtml(image.id)}" title="Eliminar foto" aria-label="Eliminar foto ${index + 1}">${icon('trash')}</button>
-            </div>
-          </article>`
-      )
-      .join('');
+    const existingCards = images.map(
+      (image, index) => `
+        <article class="editor-photo" data-image-id="${escapeHtml(image.id)}">
+          <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || product.name)}" loading="lazy" decoding="async">
+          ${image.isCover ? '<span class="editor-photo__cover">Portada</span>' : ''}
+          <div class="editor-photo__actions">
+            <button type="button" data-photo-action="cover" data-image-id="${escapeHtml(image.id)}" title="Usar como portada" aria-label="Usar foto ${index + 1} como portada" ${image.isCover ? 'disabled' : ''}>${icon('star')}</button>
+            <button type="button" data-photo-action="left" data-image-id="${escapeHtml(image.id)}" title="Mover a la izquierda" aria-label="Mover foto ${index + 1} a la izquierda" ${index === 0 ? 'disabled' : ''}>${icon('chevron-left')}</button>
+            <button type="button" data-photo-action="right" data-image-id="${escapeHtml(image.id)}" title="Mover a la derecha" aria-label="Mover foto ${index + 1} a la derecha" ${index === images.length - 1 ? 'disabled' : ''}>${icon('chevron-right')}</button>
+            <button type="button" data-photo-action="delete" data-image-id="${escapeHtml(image.id)}" title="Eliminar foto" aria-label="Eliminar foto ${index + 1}">${icon('trash')}</button>
+          </div>
+        </article>`
+    );
+
+    const pendingCards = pending.map((photo, pendingIndex) => {
+      const index = images.length + pendingIndex;
+      const isCover = images.length === 0 && pendingIndex === 0;
+      return `
+        <article class="editor-photo editor-photo--pending" data-pending-id="${escapeHtml(photo.id)}">
+          <img src="${escapeHtml(photo.url)}" alt="Foto pendiente ${index + 1}" loading="lazy" decoding="async">
+          ${isCover ? '<span class="editor-photo__cover">Portada</span>' : '<span class="editor-photo__pending">Pendiente</span>'}
+          <div class="editor-photo__actions">
+            <button type="button" data-pending-action="remove" data-pending-id="${escapeHtml(photo.id)}" title="Quitar foto" aria-label="Quitar foto ${index + 1}">${icon('trash')}</button>
+          </div>
+        </article>`;
+    });
+
+    elements.editorPhotos.innerHTML = existingCards.concat(pendingCards).join('');
   }
 
   function openEditor(productId = null) {
@@ -762,7 +802,7 @@
     } else {
       elements.productDialog.setAttribute('open', '');
     }
-    window.setTimeout(() => elements.productCode.focus(), 40);
+    elements.productCode.focus({ preventScroll: true });
   }
 
   function closeProductDialog() {
@@ -817,8 +857,40 @@
 
     setBusy(elements.productForm, true);
     const wasEditing = Boolean(state.editingId);
+    const pending = wasEditing ? [] : state.pendingPhotos.slice();
     try {
       const saved = await backend.admin.saveProduct(state.editingId, input);
+
+      if (!wasEditing && pending.length) {
+        try {
+          await backend.admin.uploadImages(
+            saved.id,
+            pending.map((photo) => photo.file)
+          );
+          clearPendingPhotos();
+          closeProductDialog();
+          showToast('Producto creado con fotos');
+          await loadData(true);
+          return saved;
+        } catch (uploadError) {
+          clearPendingPhotos();
+          state.editingId = saved.id;
+          state.editorProduct = saved;
+          if (elements.dialogKicker) elements.dialogKicker.textContent = 'Catálogo / Editar';
+          if (elements.dialogTitle) elements.dialogTitle.textContent = 'Editar producto';
+          await loadData(true);
+          const fresh =
+            state.products.find((item) => Number(item.id) === Number(saved.id)) || saved;
+          state.editorProduct = fresh;
+          renderEditorPhotos(fresh);
+          showEditorAlert(
+            `El producto se creó, pero no se pudieron subir las fotos. ${uploadError.message}`
+          );
+          showToast('Producto creado');
+          return saved;
+        }
+      }
+
       closeProductDialog();
       showToast(wasEditing ? 'Producto actualizado' : 'Producto creado');
       await loadData(true);
@@ -975,7 +1047,7 @@
 
     state.busy = true;
     if (elements.editorPhotosNote) elements.editorPhotosNote.textContent = 'Optimizando y subiendo fotos…';
-    if (elements.editorUploadLabel) elements.editorUploadLabel.classList.add('is-disabled');
+    if (elements.editorUploadButton) elements.editorUploadButton.classList.add('is-disabled');
     try {
       const updated = await backend.admin.uploadImages(state.editingId, files);
       replaceProduct(updated);
@@ -985,12 +1057,64 @@
       if (elements.editorPhotosNote) elements.editorPhotosNote.textContent = 'No se pudieron subir las fotos.';
     } finally {
       state.busy = false;
-      if (elements.photoInput) {
-        elements.photoInput.value = '';
-        elements.photoInput.disabled = false;
-      }
+      if (elements.photoInput) elements.photoInput.value = '';
       if (state.editorProduct) renderEditorPhotos(state.editorProduct);
-      else if (elements.editorUploadLabel) elements.editorUploadLabel.classList.remove('is-disabled');
+    }
+  }
+
+  function removePendingPhoto(id) {
+    const index = state.pendingPhotos.findIndex((photo) => String(photo.id) === String(id));
+    if (index < 0) return;
+    const [removed] = state.pendingPhotos.splice(index, 1);
+    try {
+      URL.revokeObjectURL(removed.url);
+    } catch (error) {
+      // La URL ya puede estar liberada.
+    }
+    hideEditorAlert();
+    renderEditorPhotos(null);
+  }
+
+  async function handlePhotoSelection(files) {
+    const list = Array.from(files || []);
+    if (!list.length) return;
+
+    if (state.editingId) {
+      await uploadPhotos(list);
+      return;
+    }
+
+    const remaining = Math.max(0, maxImages - state.pendingPhotos.length);
+    if (remaining === 0) {
+      showEditorAlert(`Cada producto puede tener hasta ${maxImages} fotos.`);
+      return;
+    }
+
+    const accepted = [];
+    let firstError = '';
+    list.slice(0, remaining).forEach((file) => {
+      const error = backend.validateImageFile ? backend.validateImageFile(file) : '';
+      if (error) {
+        if (!firstError) firstError = error;
+        return;
+      }
+      accepted.push({
+        id: photoUid(),
+        file,
+        url: URL.createObjectURL(file),
+      });
+    });
+
+    if (accepted.length) {
+      state.pendingPhotos.push(...accepted);
+      hideEditorAlert();
+      renderEditorPhotos(null);
+    }
+
+    if (firstError) {
+      showEditorAlert(firstError);
+    } else if (list.length > remaining) {
+      showEditorAlert(`Podés agregar hasta ${maxImages} fotos por producto.`);
     }
   }
 
@@ -1058,8 +1182,19 @@
       elements.productForm.addEventListener('submit', saveProduct);
     }
 
+    if (elements.editorUploadButton) {
+      elements.editorUploadButton.addEventListener('click', () => {
+        if (elements.editorUploadButton.disabled || !elements.photoInput) return;
+        elements.photoInput.click();
+      });
+    }
+
     if (elements.photoInput) {
-      elements.photoInput.addEventListener('change', () => uploadPhotos(elements.photoInput.files));
+      elements.photoInput.addEventListener('change', async () => {
+        const files = Array.from(elements.photoInput.files || []);
+        elements.photoInput.value = '';
+        await handlePhotoSelection(files);
+      });
     }
 
     $$('[data-close-dialog]').forEach((button) => {
@@ -1073,6 +1208,7 @@
       elements.productDialog.addEventListener('close', () => {
         state.editingId = null;
         state.editorProduct = null;
+        clearPendingPhotos();
         hideEditorAlert();
       });
       elements.productDialog.addEventListener('click', (event) => {
@@ -1105,6 +1241,12 @@
 
     if (elements.editorPhotos) {
       elements.editorPhotos.addEventListener('click', (event) => {
+        const pendingButton = event.target.closest('[data-pending-action]');
+        if (pendingButton) {
+          event.preventDefault();
+          removePendingPhoto(pendingButton.dataset.pendingId);
+          return;
+        }
         const button = event.target.closest('[data-photo-action]');
         if (!button) return;
         event.preventDefault();

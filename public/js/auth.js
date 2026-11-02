@@ -52,6 +52,13 @@
   const status = backend.getSetupStatus ? backend.getSetupStatus() : {};
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  function currentTheme() {
+    if (window.FerroMaxTheme && typeof window.FerroMaxTheme.current === 'function') {
+      return window.FerroMaxTheme.current();
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
   let session = null;
   let toastTimer = null;
   let captchaWidget = null;
@@ -122,10 +129,8 @@
       window.history.replaceState(null, '', `#${next === 'login' ? 'ingresar' : 'registro'}`);
     }
 
-    window.setTimeout(() => {
-      const field = next === 'login' ? $('#login-email') : $('#register-name');
-      if (field && !reducedMotion.matches) field.focus();
-    }, 40);
+    const field = next === 'login' ? $('#login-email') : $('#register-name');
+    if (field && !reducedMotion.matches) field.focus({ preventScroll: true });
   }
 
   function updateModeUi() {
@@ -229,10 +234,9 @@
 
     try {
       await loadTurnstile();
-      const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       captchaWidget = window.turnstile.render(container, {
         sitekey: config.turnstileSiteKey,
-        theme,
+        theme: currentTheme(),
         size: 'flexible',
         appearance: 'always',
       });
@@ -243,6 +247,18 @@
       if (elements.captchaWrap) elements.captchaWrap.hidden = true;
       showAlert(elements.authAlert, error.message, 'error');
     }
+  }
+
+  function refreshTurnstileTheme() {
+    if (!hasTurnstile || captchaWidget === null || !window.turnstile) return;
+    if (elements.authView && elements.authView.hidden) return;
+    try {
+      window.turnstile.remove(captchaWidget);
+    } catch (error) {
+      // Si el widget ya no existe, continuamos con el siguiente render.
+    }
+    captchaWidget = null;
+    setupTurnstile();
   }
 
   function getCaptchaToken() {
@@ -427,7 +443,7 @@
       const show = input.type === 'password';
       input.type = show ? 'text' : 'password';
       toggle.textContent = show ? 'Ocultar' : 'Ver';
-      toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Ver contraseña');
     });
   }
 
@@ -506,6 +522,10 @@
         resetCaptcha();
       }
     });
+
+    if (window.FerroMaxTheme && typeof window.FerroMaxTheme.subscribe === 'function') {
+      window.FerroMaxTheme.subscribe(() => refreshTurnstileTheme());
+    }
   }
 
   init();

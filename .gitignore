@@ -12,6 +12,8 @@ node_modules/
 supabase/.temp/
 supabase/.branches/
 .vercel/
+playwright-report/
+test-results/
 *.log
 *.tmp
 

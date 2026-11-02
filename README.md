@@ -34,6 +34,8 @@ También podés ejecutar `configurar.bat` para generar la configuración local y
   - Papelera con restaurar y eliminar definitivamente.
   - Historial de cambios.
   - Restauración completa de los 32 productos originales.
+- Tema claro y oscuro: sigue al sistema por defecto y el switch guarda una preferencia manual.
+- Suite de pruebas: unitarias, seguridad, RLS de integración y E2E con Playwright en escritorio y móvil.
 - Modo local de respaldo: todo funciona sin Supabase usando `localStorage` + IndexedDB.
 - Publicación automática en GitHub Pages y keep-alive para Supabase Free.
 
@@ -87,6 +89,14 @@ Genera `public/js/config.js` con UTF-8, sin tocar el resto del proyecto. Si Git 
 GitHub CLI es opcional. Si no lo tenés, instalalo desde [cli.github.com](https://cli.github.com/) o cargá los secretos a mano en GitHub.
 
 > La `service_role` nunca debe llegar al navegador ni al repositorio. La publishable key y la site key son datos públicos.
+
+## Tema claro y oscuro
+
+Sin preferencia guardada, el sitio sigue siempre al sistema operativo mediante `prefers-color-scheme` y no escribe `data-theme` en el documento. Al usar el switch, se guarda `light` o `dark` en `localStorage` con la clave `ferromax.theme.v1`, se aplica `data-theme` en `<html>` y la elección se mantiene en las cuatro páginas y entre recargas.
+
+El switch es un control accesible con `role="switch"`, `aria-checked` y una etiqueta que cambia entre **Cambiar a modo oscuro** y **Cambiar a modo claro**.
+
+La API `window.FerroMaxTheme` expone `current()`, `set(theme)`, `toggle()`, `clear()` y `subscribe(listener)`. Cada cambio emite el evento `ferromax:themechange`. Para volver a seguir al sistema, ejecutá `window.FerroMaxTheme.clear()` desde la consola.
 
 ## Configurar Supabase Free
 
@@ -200,7 +210,7 @@ Si `origin` ya existe, usá `git remote set-url origin https://github.com/TU_USU
    - `TURNSTILE_SITE_KEY` (opcional)
 4. Hacé push a `main`.
 
-El workflow genera `public/js/config.js` con los secretos y publica la carpeta `public`. El archivo local `public/js/config.js` está en `.gitignore`, así que las claves no se versionan.
+El workflow ejecuta las pruebas y, solo si pasan, genera `public/js/config.js` con los secretos y publica la carpeta `public`. El archivo local `public/js/config.js` está en `.gitignore`, así que las claves no se versionan.
 
 URL esperada:
 
@@ -209,6 +219,44 @@ https://USUARIO.github.io/NOMBRE_DEL_REPO/
 ```
 
 Si el sitio aparece en modo local, revisá que los secretos existan y que el último deploy se haya ejecutado después de cargarlos.
+
+## Pruebas
+
+La suite usa Node 20 o superior y Playwright. En Windows, Playwright ejecuta el Microsoft Edge instalado; en GitHub Actions usa el Chromium que descarga el workflow.
+
+```powershell
+npm ci
+npm run test:install   # Chromium para CI o equipos sin Edge
+npm run test:all
+```
+
+| Comando | Qué prueba |
+| --- | --- |
+| `npm run test:unit` | 9 categorías, 36 subcategorías, 32 productos y paridad entre `data.js` y el seed SQL. |
+| `npm run test:security` | Validación de fotos, detección de claves secretas, sesión local, RLS declarado y configuración pública. |
+| `npm run test:e2e` | Tienda, cuentas, panel, fotos, tema, XSS, accesibilidad y responsive en escritorio y móvil. |
+| `npm run test:security:rls` | Integración real contra un proyecto Supabase exclusivo de pruebas. |
+
+Las pruebas de navegador siempre fuerzan el modo local e interceptan `js/config.js`; además bloquean pedidos externos. Así nunca escriben en la demo pública ni necesitan credenciales de Supabase.
+
+En GitHub Actions, el job **Pruebas** corre unitarias, seguridad y E2E antes de **Desplegar**. Si alguna falla, no se publica y el reporte de Playwright queda como artefacto.
+
+### Pruebas RLS contra un proyecto de pruebas
+
+Las pruebas de integración RLS y Storage necesitan un proyecto Supabase **exclusivo de pruebas**, con las migraciones aplicadas. No uses el proyecto de la demo pública.
+
+```powershell
+$env:SUPABASE_TEST_URL = 'https://tu-proyecto-de-pruebas.supabase.co'
+$env:SUPABASE_TEST_ANON_KEY = 'tu-anon-key-de-pruebas'
+$env:SUPABASE_TEST_SERVICE_ROLE_KEY = 'tu-service-role-de-pruebas'
+$env:SUPABASE_TEST_ALLOW_WRITES = 'true'
+npm run test:security:rls
+```
+
+- `SUPABASE_TEST_SERVICE_ROLE_KEY` se usa solo dentro del runner para preparar y limpiar datos; no se escribe en archivos ni llega al navegador.
+- `SUPABASE_TEST_ALLOW_WRITES=true` es obligatorio para las pruebas que crean datos.
+- La suite se niega a correr si `SUPABASE_TEST_URL` coincide con `SUPABASE_URL`.
+- Sin esas variables, la suite se marca como omitida con el motivo visible y el resto de las pruebas sigue pasando.
 
 ## Mantener Supabase activo
 
@@ -239,11 +287,20 @@ Supabase Free pausa un proyecto tras 7 días sin actividad. El workflow `.github
 │     ├─ app.js
 │     ├─ auth.js
 │     ├─ admin.js
+│     ├─ theme.js
 │     └─ vendor/supabase.js
 ├─ supabase/migrations/
-├─ scripts/configurar.ps1
+├─ tests/
+│  ├─ unit/
+│  ├─ security/
+│  └─ e2e/
+├─ scripts/
+│  ├─ configurar.ps1
+│  └─ serve-public.mjs
 ├─ .github/workflows/
 ├─ configurar.bat
+├─ package.json
+├─ playwright.config.ts
 └─ README.md
 ```
 
@@ -254,6 +311,8 @@ Supabase Free pausa un proyecto tras 7 días sin actividad. El workflow `.github
 - `public/js/app.js`: tienda, carrito y favoritos.
 - `public/js/auth.js`: ingreso, registro, Turnstile y cambio de contraseña.
 - `public/js/admin.js`: panel, fotos, papelera, historial y reset.
+- `public/js/theme.js`: tema del sistema, preferencia manual, switch y API pública.
+- `tests/`: suites unitarias, de seguridad, RLS de integración y E2E con Playwright.
 
 ## Seguridad
 
