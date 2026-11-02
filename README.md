@@ -4,6 +4,11 @@ Sitio de demostración con catálogo, carrito, favoritos, cuentas y panel de adm
 
 La interfaz mantiene una estética industrial en naranja y carbón, con esquinas rectas, iconos SVG lineales y sin emojis.
 
+**Demo publicada:** <https://droweh.github.io/ferromax-demo/>  
+**Repositorio:** <https://github.com/Droweh/ferromax-demo>
+
+La versión publicada funciona en modo local: los datos y las fotos se guardan en el navegador. Para activar cuentas y catálogo compartidos, configurá Supabase como se explica más abajo.
+
 ## Puesta en marcha rápida
 
 1. Creá un proyecto **Supabase Free** y anotá la **Project URL** y la **publishable key**.
