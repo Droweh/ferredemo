@@ -148,6 +148,8 @@
       const transaction = currentDb.transaction(STORE, 'readonly');
       const count = await requestAsPromise(transaction.objectStore(STORE).count());
 
+      /* shortcut: la copia es todo o nada; si la base nueva ya tiene fotos, no se mezclan.
+         Migrar por clave si alguna vez conviven datos de las dos versiones. */
       if (count === 0) await writeRecords(currentDb, records);
 
       closeDatabase(currentDb);
