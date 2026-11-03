@@ -63,7 +63,7 @@ export async function localReset(page: Page): Promise<void> {
   await page.evaluate(async () => {
     window.localStorage.clear();
     await new Promise((resolve) => {
-      const request = window.indexedDB.deleteDatabase('ferromax-demo-images');
+      const request = window.indexedDB.deleteDatabase('ferredemo-demo-images');
       request.onsuccess = () => resolve(undefined);
       request.onerror = () => resolve(undefined);
       request.onblocked = () => resolve(undefined);

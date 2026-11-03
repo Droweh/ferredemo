@@ -9,7 +9,7 @@ export function loadCatalogData() {
   const source = readFileSync(resolve(projectRoot, 'public/js/data.js'), 'utf8');
   const sandbox = { window: {} };
   runInNewContext(source, sandbox, { filename: 'public/js/data.js' });
-  return sandbox.window.FERROMAX;
+  return sandbox.window.FERREDEMO;
 }
 
 export function readProjectFile(relativePath) {

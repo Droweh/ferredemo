@@ -1,17 +1,17 @@
 /* Lógica de la tienda de FerreDemo.
-   El catálogo puede venir del modo local o de Supabase; el carrito y los
-   favoritos siempre se guardan en el navegador. */
+   El catálogo se carga desde el almacenamiento local; el carrito y los
+   favoritos se guardan en el navegador. */
 (() => {
   'use strict';
 
-  const data = window.FERROMAX;
-  const backend = window.FerroMaxBackend;
+  const data = window.FERREDEMO;
+  const backend = window.FerreDemoBackend;
 
   if (!data || !backend) {
     document.addEventListener('DOMContentLoaded', () => {
       const message = document.createElement('p');
       message.className = 'empty-state';
-      message.textContent = 'No pudimos iniciar la tienda. Revisá los archivos js/config.js y js/backend.js.';
+      message.textContent = 'No pudimos iniciar la tienda. Revisá los archivos js/data.js y js/backend.js.';
       const main = document.querySelector('main');
       if (main) main.prepend(message);
     });
@@ -23,8 +23,8 @@
   const pageType = document.body.dataset.page || 'home';
 
   const STORAGE_KEYS = {
-    cart: 'ferromax.cart.v1',
-    favorites: 'ferromax.favorites.v1',
+    cart: 'ferredemo.cart.v1',
+    favorites: 'ferredemo.favorites.v1',
   };
 
   const state = {
@@ -1397,7 +1397,7 @@
     if (pageType === 'catalog') {
       showCatalogError(
         'No pudimos cargar el catálogo',
-        `${message} Revisá la configuración de Supabase o reintentá en unos segundos.`,
+        `${message} Reintentá en unos segundos.`,
         window.location.href,
         'Reintentar'
       );

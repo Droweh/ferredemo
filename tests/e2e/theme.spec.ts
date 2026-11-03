@@ -31,7 +31,7 @@ test.describe('Tema claro y oscuro', () => {
     await expect(html).toHaveAttribute('data-theme', 'dark');
     await expect(toggle).toHaveAttribute('aria-checked', 'true');
     await expect
-      .poll(() => page.evaluate(() => window.localStorage.getItem('ferromax.theme.v1')))
+      .poll(() => page.evaluate(() => window.localStorage.getItem('ferredemo.theme.v1')))
       .toBe('dark');
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0f1112');
 
@@ -50,7 +50,7 @@ test.describe('Tema claro y oscuro', () => {
     await page.getByRole('switch').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect
-      .poll(() => page.evaluate(() => window.localStorage.getItem('ferromax.theme.v1')))
+      .poll(() => page.evaluate(() => window.localStorage.getItem('ferredemo.theme.v1')))
       .toBe('light');
     await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#f3f1ec');
   });
@@ -65,11 +65,11 @@ test.describe('Tema claro y oscuro', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect(page.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
 
-    await page.evaluate(() => window.FerroMaxTheme.clear());
+    await page.evaluate(() => window.FerreDemoTheme.clear());
     await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.*/);
     await expect(page.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
     await expect
-      .poll(() => page.evaluate(() => window.localStorage.getItem('ferromax.theme.v1')))
+      .poll(() => page.evaluate(() => window.localStorage.getItem('ferredemo.theme.v1')))
       .toBeNull();
   });
 
@@ -83,7 +83,7 @@ test.describe('Tema claro y oscuro', () => {
       const before = await toggle.getAttribute('aria-checked');
       await toggle.click();
       await expect(toggle).not.toHaveAttribute('aria-checked', before ?? '');
-      await page.evaluate(() => window.FerroMaxTheme.clear());
+      await page.evaluate(() => window.FerreDemoTheme.clear());
     }
 
     await page.goto('/admin.html');

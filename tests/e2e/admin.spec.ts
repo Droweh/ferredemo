@@ -154,7 +154,7 @@ test.describe('Panel de administración', () => {
   test('restaura la demo completa y elimina productos de prueba', async ({ page }) => {
     await loginAsAdmin(page);
     await page.evaluate(async () => {
-      await window.FerroMaxBackend.admin.saveProduct(null, {
+      await window.FerreDemoBackend.admin.saveProduct(null, {
         code: 'FDRESET1',
         name: 'Producto a borrar con el reset',
         category: 'herramientas',

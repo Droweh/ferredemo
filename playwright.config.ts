@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const isCI = Boolean(process.env.CI);
-const baseURL = process.env.FERROMAX_TEST_URL || 'http://127.0.0.1:4173';
+const baseURL = process.env.FERREDEMO_TEST_URL || 'http://127.0.0.1:4173';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -48,7 +48,7 @@ export default defineConfig({
       },
     },
   ],
-  webServer: process.env.FERROMAX_TEST_URL
+  webServer: process.env.FERREDEMO_TEST_URL
     ? undefined
     : {
         command: 'node scripts/serve-public.mjs',

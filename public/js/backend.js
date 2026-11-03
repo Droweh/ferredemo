@@ -1,23 +1,20 @@
 /* Adaptador de datos y autenticación de FerreDemo.
-   - Modo local: demo completa en el navegador (localStorage + IndexedDB).
-   - Modo Supabase: Auth, Postgres y Storage reales.
-   La interfaz de la tienda y del panel es la misma para ambos modos. */
+   Demo completa en el navegador: localStorage + IndexedDB. */
 (() => {
   'use strict';
 
-  const CONFIG = window.FERROMAX_CONFIG || {};
-  const DATA = window.FERROMAX || { categories: [], products: [] };
+  const DATA = window.FERREDEMO || { categories: [], products: [] };
 
   const LOCAL_KEYS = {
-    users: 'ferromax.demo.users.v1',
-    session: 'ferromax.demo.session.v1',
-    products: 'ferromax.demo.products.v1',
-    audit: 'ferromax.demo.audit.v1',
-    version: 'ferromax.demo.version.v1',
+    users: 'ferredemo.demo.users.v1',
+    session: 'ferredemo.demo.session.v1',
+    products: 'ferredemo.demo.products.v1',
+    audit: 'ferredemo.demo.audit.v1',
+    version: 'ferredemo.demo.version.v1',
   };
   const LOCAL_CATALOG_VERSION = 2;
 
-  const IDB_NAME = 'ferromax-demo-images';
+  const IDB_NAME = 'ferredemo-demo-images';
   const IDB_STORE = 'images';
   const MAX_IMAGES = 5;
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -29,17 +26,6 @@
     { label: 'Cliente', email: 'cliente@ferredemo.com', password: 'Cliente1234!' },
   ];
 
-  const supabaseUrl = String(CONFIG.supabaseUrl || '').trim();
-  const supabaseAnonKey = String(CONFIG.supabaseAnonKey || '').trim();
-  const mode =
-    CONFIG.mode === 'local'
-      ? 'local'
-      : supabaseUrl && supabaseAnonKey && CONFIG.mode !== 'local'
-        ? 'supabase'
-        : 'local';
-
-  let client = null;
-  let initError = null;
   let imageCache = null;
   let imageCachePromise = null;
   let dbPromise = null;
@@ -55,23 +41,6 @@
     if (!file.size) return 'La foto está vacía o dañada.';
     if (file.size > MAX_FILE_SIZE) return 'Cada foto puede pesar como máximo 5 MB.';
     return '';
-  }
-
-  function isSecretKey(value) {
-    const key = String(value || '').trim();
-    if (!key) return false;
-    if (/service_role/i.test(key) || key.startsWith('sb_secret_')) return true;
-    if (!key.startsWith('eyJ')) return false;
-    try {
-      const segment = key.split('.')[1];
-      if (!segment) return false;
-      const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
-      const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
-      const payload = JSON.parse(window.atob(padded));
-      return payload.role === 'service_role';
-    } catch (error) {
-      return false;
-    }
   }
 
   function readStorage(key) {
@@ -110,20 +79,6 @@
     return bytesToHex(digest);
   }
 
-  function mapSupabaseUser(user) {
-    if (!user) return null;
-    return {
-      id: user.id,
-      email: user.email || '',
-      name:
-        (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) ||
-        (user.email || '').split('@')[0] ||
-        'Mi cuenta',
-      role: (user.app_metadata && user.app_metadata.role) || 'customer',
-      isAdmin: Boolean(user.app_metadata && user.app_metadata.role === 'admin'),
-    };
-  }
-
   function mapLocalUser(user) {
     if (!user) return null;
     return {
@@ -135,412 +90,6 @@
     };
   }
 
-  function normalizeError(error, fallback = 'Ocurrió un error. Intentá de nuevo.') {
-    const message = String((error && (error.message || error.error_description || error.msg)) || '');
-    const lower = message.toLowerCase();
-
-    if (lower.includes('invalid login credentials')) return new Error('Email o contraseña incorrectos.');
-    if (lower.includes('user already registered') || lower.includes('already been registered'))
-      return new Error('Ese email ya tiene una cuenta. Probá iniciando sesión.');
-    if (lower.includes('email not confirmed'))
-      return new Error('La confirmación por email está activa en Supabase. Desactivala en Authentication > Providers > Email.');
-    if (lower.includes('password should be') || lower.includes('weak password'))
-      return new Error('La contraseña es demasiado débil. Usá al menos 8 caracteres.');
-    if (lower.includes('captcha'))
-      return new Error('No pudimos validar el captcha. Intentá de nuevo.');
-    if (lower.includes('failed to fetch') || lower.includes('networkerror') || lower.includes('load failed'))
-      return new Error('No pudimos conectar con Supabase. Revisá la configuración o si el proyecto está pausado.');
-    if (lower.includes('duplicate key') && lower.includes('code'))
-      return new Error('Ese código de producto ya existe. Usá otro.');
-    if (lower.includes('row-level security') || lower.includes('permission denied'))
-      return new Error('No tenés permisos para hacer esta operación.');
-    if (lower.includes('jwt') && lower.includes('expired'))
-      return new Error('La sesión venció. Volvé a iniciar sesión.');
-    if (message) return new Error(message);
-    return new Error(fallback);
-  }
-
-  /* Supabase --------------------------------------------------------------- */
-  function initSupabase() {
-    if (mode !== 'supabase') return;
-    if (isSecretKey(supabaseAnonKey)) {
-      initError = new Error(
-        'La configuración usa una clave secreta. Reemplazala por la publishable key o la anon public key.'
-      );
-      return;
-    }
-    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      initError = new Error('No se cargó la librería de Supabase. Revisá js/vendor/supabase.js.');
-      return;
-    }
-    try {
-      client = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: false,
-        },
-      });
-    } catch (error) {
-      initError = normalizeError(error, 'No pudimos inicializar Supabase. Revisá la URL y la publishable key.');
-    }
-  }
-
-  function assertSupabase() {
-    if (initError) throw initError;
-    if (!client) throw new Error('Supabase no está configurado. Ejecutá configurar.bat.');
-    return client;
-  }
-
-  function publicImageUrl(path) {
-    if (!path) return '';
-    if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http')) return path;
-    return assertSupabase().storage.from('product-images').getPublicUrl(path).data.publicUrl;
-  }
-
-  function mapSupabaseProduct(row) {
-    const images = (row.product_images || [])
-      .slice()
-      .sort((a, b) => {
-        const order = (a.sort_order || 0) - (b.sort_order || 0);
-        return order !== 0 ? order : String(a.id).localeCompare(String(b.id));
-      })
-      .map((image) => ({
-        id: image.id,
-        productId: Number(row.id),
-        path: image.storage_path,
-        url: publicImageUrl(image.storage_path),
-        alt: image.alt || '',
-        sortOrder: image.sort_order || 0,
-        isCover: Boolean(image.is_cover),
-      }));
-
-    return {
-      id: Number(row.id),
-      code: row.code,
-      name: row.name,
-      description: row.description || '',
-      price: Number(row.price_cents || 0) / 100,
-      oldPrice: Number(row.old_price_cents || 0) / 100,
-      stock: Number(row.stock || 0),
-      inStock: Number(row.stock || 0) > 0,
-      collection: row.collection || null,
-      category: row.category_id,
-      subcategory: row.subcategory_id || null,
-      icon: row.icon || 'toolbox',
-      status: row.status || 'published',
-      deletedAt: row.deleted_at || null,
-      images,
-    };
-  }
-
-  function productToRow(input) {
-    return {
-      code: String(input.code || '').trim().toUpperCase(),
-      name: String(input.name || '').trim(),
-      description: String(input.description || '').trim(),
-      price_cents: Math.max(0, Math.round(Number(input.price || 0) * 100)),
-      old_price_cents:
-        Number(input.oldPrice || 0) > 0 ? Math.max(0, Math.round(Number(input.oldPrice) * 100)) : null,
-      stock: Math.max(0, Math.round(Number(input.stock || 0))),
-      category_id: input.category,
-      subcategory_id: input.subcategory || null,
-      collection: input.collection || null,
-      icon: input.icon || 'toolbox',
-      status: input.status === 'hidden' ? 'hidden' : 'published',
-    };
-  }
-
-  async function supabaseGetCatalog() {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, product_images(id, storage_path, alt, sort_order, is_cover)')
-      .is('deleted_at', null)
-      .eq('status', 'published')
-      .order('id', { ascending: true });
-
-    if (error) throw normalizeError(error, 'No pudimos cargar el catálogo.');
-    return {
-      categories: DATA.categories,
-      products: (data || []).map(mapSupabaseProduct),
-    };
-  }
-
-  async function supabaseGetAllProducts() {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, product_images(id, storage_path, alt, sort_order, is_cover)')
-      .order('id', { ascending: true });
-
-    if (error) throw normalizeError(error, 'No pudimos cargar los productos.');
-    return (data || []).map(mapSupabaseProduct);
-  }
-
-  async function supabaseGetProduct(id) {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, product_images(id, storage_path, alt, sort_order, is_cover)')
-      .eq('id', id)
-      .single();
-
-    if (error) throw normalizeError(error, 'No pudimos cargar el producto.');
-    return mapSupabaseProduct(data);
-  }
-
-  async function supabaseSaveProduct(id, input) {
-    const supabase = assertSupabase();
-    const row = productToRow(input);
-
-    if (!row.name || !row.code || !row.category_id) {
-      throw new Error('Completá nombre, código y categoría.');
-    }
-
-    if (id) {
-      const { data, error } = await supabase
-        .from('products')
-        .update(row)
-        .eq('id', id)
-        .select('*, product_images(id, storage_path, alt, sort_order, is_cover)')
-        .single();
-      if (error) throw normalizeError(error, 'No pudimos guardar los cambios.');
-      return mapSupabaseProduct(data);
-    }
-
-    const { data, error } = await supabase
-      .from('products')
-      .insert(row)
-      .select('*, product_images(id, storage_path, alt, sort_order, is_cover)')
-      .single();
-    if (error) throw normalizeError(error, 'No pudimos crear el producto.');
-    return mapSupabaseProduct(data);
-  }
-
-  async function supabaseDeleteProduct(id, permanent = false) {
-    const supabase = assertSupabase();
-    const product = await supabaseGetProduct(id);
-
-    if (permanent) {
-      const paths = (product.images || []).map((image) => image.path).filter(Boolean);
-      if (paths.length) {
-        const { error: storageError } = await supabase.storage.from('product-images').remove(paths);
-        if (storageError) throw normalizeError(storageError, 'No pudimos borrar las fotos del producto.');
-      }
-      const { error } = await supabase.from('products').delete().eq('id', id);
-      if (error) throw normalizeError(error, 'No pudimos eliminar el producto.');
-      return;
-    }
-
-    const { error } = await supabase
-      .from('products')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id);
-    if (error) throw normalizeError(error, 'No pudimos enviar el producto a la papelera.');
-  }
-
-  async function supabaseRestoreProduct(id) {
-    const supabase = assertSupabase();
-    const { error } = await supabase.from('products').update({ deleted_at: null }).eq('id', id);
-    if (error) throw normalizeError(error, 'No pudimos restaurar el producto.');
-  }
-
-  async function supabaseUploadImages(productId, files) {
-    const supabase = assertSupabase();
-    const product = await supabaseGetProduct(productId);
-    const currentImages = product.images || [];
-
-    const remaining = Math.max(0, MAX_IMAGES - currentImages.length);
-    if (remaining === 0) throw new Error(`Cada producto puede tener hasta ${MAX_IMAGES} fotos.`);
-
-    const list = Array.from(files || []).slice(0, remaining);
-    const hasCover = currentImages.some((image) => image.isCover);
-    const maxOrder = currentImages.reduce(
-      (highest, image) => Math.max(highest, Number(image.sortOrder) || 0),
-      -1
-    );
-
-    for (let index = 0; index < list.length; index += 1) {
-      const prepared = await compressImage(list[index]);
-      const path = `${productId}/${uid()}.webp`;
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(path, prepared.blob, { contentType: 'image/webp', upsert: false });
-      if (uploadError) throw normalizeError(uploadError, 'No pudimos subir la foto.');
-
-      const { error: insertError } = await supabase.from('product_images').insert({
-        product_id: productId,
-        storage_path: path,
-        alt: '',
-        sort_order: maxOrder + 1 + index,
-        is_cover: !hasCover && index === 0,
-      });
-      if (insertError) {
-        await supabase.storage.from('product-images').remove([path]);
-        throw normalizeError(insertError, 'No pudimos guardar la foto.');
-      }
-    }
-
-    return supabaseGetProduct(productId);
-  }
-
-  async function supabaseDeleteImage(image) {
-    const supabase = assertSupabase();
-    if (image.path) {
-      const { error: storageError } = await supabase.storage.from('product-images').remove([image.path]);
-      if (storageError) throw normalizeError(storageError, 'No pudimos borrar el archivo de la foto.');
-    }
-    const { error } = await supabase.from('product_images').delete().eq('id', image.id);
-    if (error) throw normalizeError(error, 'No pudimos borrar la foto.');
-
-    if (image.isCover && image.productId) {
-      const { data, error: nextError } = await supabase
-        .from('product_images')
-        .select('id')
-        .eq('product_id', image.productId)
-        .order('sort_order', { ascending: true })
-        .limit(1);
-      if (nextError) throw normalizeError(nextError, 'No pudimos actualizar la portada.');
-      if (data && data.length) {
-        const { error: coverError } = await supabase
-          .from('product_images')
-          .update({ is_cover: true })
-          .eq('id', data[0].id);
-        if (coverError) throw normalizeError(coverError, 'No pudimos actualizar la portada.');
-      }
-    }
-  }
-
-  async function supabaseSetCover(productId, imageId) {
-    const supabase = assertSupabase();
-    const { error: clearError } = await supabase
-      .from('product_images')
-      .update({ is_cover: false })
-      .eq('product_id', productId);
-    if (clearError) throw normalizeError(clearError, 'No pudimos cambiar la portada.');
-
-    const { error } = await supabase.from('product_images').update({ is_cover: true }).eq('id', imageId);
-    if (error) throw normalizeError(error, 'No pudimos cambiar la portada.');
-  }
-
-  async function supabaseMoveImage(productId, imageId, direction) {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from('product_images')
-      .select('id, sort_order')
-      .eq('product_id', productId)
-      .order('sort_order', { ascending: true });
-    if (error) throw normalizeError(error, 'No pudimos reordenar las fotos.');
-
-    const list = data || [];
-    const index = list.findIndex((image) => image.id === imageId);
-    const target = index + direction;
-    if (index < 0 || target < 0 || target >= list.length) return;
-
-    const current = list[index];
-    const other = list[target];
-    const updates = [
-      { id: current.id, sort_order: other.sort_order },
-      { id: other.id, sort_order: current.sort_order },
-    ];
-
-    for (const update of updates) {
-      const { error: updateError } = await supabase
-        .from('product_images')
-        .update({ sort_order: update.sort_order })
-        .eq('id', update.id);
-      if (updateError) throw normalizeError(updateError, 'No pudimos reordenar las fotos.');
-    }
-  }
-
-  async function supabaseResetDemo() {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase.from('product_images').select('storage_path');
-    if (error) throw normalizeError(error, 'No pudimos preparar la restauración.');
-
-    const paths = (data || []).map((image) => image.storage_path).filter(Boolean);
-    for (let index = 0; index < paths.length; index += 100) {
-      const batch = paths.slice(index, index + 100);
-      const { error: storageError } = await supabase.storage.from('product-images').remove(batch);
-      if (storageError) throw normalizeError(storageError, 'No pudimos borrar las fotos de la demo.');
-    }
-
-    const { error: rpcError } = await supabase.rpc('reset_demo_catalog');
-    if (rpcError) throw normalizeError(rpcError, 'No pudimos restaurar el catálogo.');
-  }
-
-  async function supabaseGetAudit() {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from('audit_log')
-      .select('id, action, entity, entity_id, before, after, created_at, user_id')
-      .order('created_at', { ascending: false })
-      .limit(30);
-    if (error) throw normalizeError(error, 'No pudimos cargar el historial.');
-    return data || [];
-  }
-
-  async function supabaseGetSession() {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase.auth.getSession();
-    if (error) throw normalizeError(error, 'No pudimos leer la sesión.');
-    return mapSupabaseUser(data.session ? data.session.user : null);
-  }
-
-  async function supabaseSignUp({ name, email, password, captchaToken }) {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase.auth.signUp({
-      email: String(email || '').trim().toLowerCase(),
-      password,
-      options: {
-        data: { full_name: String(name || '').trim() },
-        ...(captchaToken ? { captchaToken } : {}),
-      },
-    });
-    if (error) throw normalizeError(error, 'No pudimos crear la cuenta.');
-    if (!data.session) {
-      throw new Error(
-        'La confirmación por email está activa en Supabase. Desactivala en Authentication > Providers > Email para que el registro sea directo.'
-      );
-    }
-    return mapSupabaseUser(data.session.user);
-  }
-
-  async function supabaseSignIn({ email, password, captchaToken }) {
-    const supabase = assertSupabase();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: String(email || '').trim().toLowerCase(),
-      password,
-      options: captchaToken ? { captchaToken } : undefined,
-    });
-    if (error) throw normalizeError(error, 'No pudimos iniciar sesión.');
-    return mapSupabaseUser(data.session ? data.session.user : null);
-  }
-
-  async function supabaseSignOut() {
-    const supabase = assertSupabase();
-    const { error } = await supabase.auth.signOut();
-    if (error) throw normalizeError(error, 'No pudimos cerrar sesión.');
-  }
-
-  async function supabaseUpdatePassword({ password }) {
-    const supabase = assertSupabase();
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) throw normalizeError(error, 'No pudimos cambiar la contraseña.');
-  }
-
-  function supabaseOnAuthChange(callback) {
-    if (!client) return () => {};
-    const { data } = client.auth.onAuthStateChange((_event, session) => {
-      callback(mapSupabaseUser(session ? session.user : null));
-    });
-    return () => {
-      if (data && data.subscription) data.subscription.unsubscribe();
-    };
-  }
-
-  /* IndexedDB para fotos del modo local ------------------------------------ */
   function openImageDb() {
     if (dbPromise) return dbPromise;
     dbPromise = new Promise((resolve, reject) => {
@@ -1199,110 +748,104 @@
   /* API pública ------------------------------------------------------------- */
   async function getSession() {
     await ready;
-    if (mode === 'local') return getLocalSessionUser();
-    if (!client) return null;
-    return supabaseGetSession();
+    return getLocalSessionUser();
   }
 
   const ready = (async () => {
-    if (mode === 'local') {
-      await ensureLocalUsers();
-      readLocalProducts();
-      await loadImageCache();
-      return;
+    if (window.FerreDemoLegacy && window.FerreDemoLegacy.ready) {
+      await window.FerreDemoLegacy.ready;
     }
-    initSupabase();
+    await ensureLocalUsers();
+    readLocalProducts();
+    await loadImageCache();
   })();
 
   const backend = {
-    mode,
-    isLocal: mode === 'local',
-    isSupabase: mode === 'supabase',
-    config: CONFIG,
-    demoCredentials: mode === 'local' ? DEMO_CREDENTIALS : [],
+    mode: 'local',
+    isLocal: true,
+    demoCredentials: DEMO_CREDENTIALS,
     maxImages: MAX_IMAGES,
     maxFileSize: MAX_FILE_SIZE,
     validateImageFile,
     ready,
     getSetupStatus() {
       return {
-        mode,
-        configured: mode === 'supabase',
-        hasTurnstile: Boolean(CONFIG.turnstileSiteKey),
-        error: initError ? initError.message : '',
+        mode: 'local',
+        configured: true,
+        error: '',
       };
     },
     async getCatalog() {
       await ready;
-      return mode === 'local' ? localGetCatalog() : supabaseGetCatalog();
+      return localGetCatalog();
     },
     getSession,
     onAuthChange(callback) {
-      return mode === 'local' ? localOnAuthChange(callback) : supabaseOnAuthChange(callback);
+      return localOnAuthChange(callback);
     },
     async signUp(payload) {
       await ready;
-      return mode === 'local' ? localSignUp(payload) : supabaseSignUp(payload);
+      return localSignUp(payload);
     },
     async signIn(payload) {
       await ready;
-      return mode === 'local' ? localSignIn(payload) : supabaseSignIn(payload);
+      return localSignIn(payload);
     },
     async signOut() {
       await ready;
-      return mode === 'local' ? localSignOut() : supabaseSignOut();
+      return localSignOut();
     },
     async updatePassword(payload) {
       await ready;
-      return mode === 'local' ? localUpdatePassword(payload) : supabaseUpdatePassword(payload);
+      return localUpdatePassword(payload);
     },
     admin: {
       async getProducts() {
         await ready;
-        return mode === 'local' ? localGetAllProducts() : supabaseGetAllProducts();
+        return localGetAllProducts();
       },
       async getProduct(id) {
         await ready;
-        return mode === 'local' ? localGetProduct(id) : supabaseGetProduct(id);
+        return localGetProduct(id);
       },
       async saveProduct(id, input) {
         await ready;
-        return mode === 'local' ? localSaveProduct(id, input) : supabaseSaveProduct(id, input);
+        return localSaveProduct(id, input);
       },
       async deleteProduct(id, permanent = false) {
         await ready;
-        return mode === 'local' ? localDeleteProduct(id, permanent) : supabaseDeleteProduct(id, permanent);
+        return localDeleteProduct(id, permanent);
       },
       async restoreProduct(id) {
         await ready;
-        return mode === 'local' ? localRestoreProduct(id) : supabaseRestoreProduct(id);
+        return localRestoreProduct(id);
       },
       async uploadImages(productId, files) {
         await ready;
-        return mode === 'local' ? localUploadImages(productId, files) : supabaseUploadImages(productId, files);
+        return localUploadImages(productId, files);
       },
       async deleteImage(image) {
         await ready;
-        return mode === 'local' ? localDeleteImage(image) : supabaseDeleteImage(image);
+        return localDeleteImage(image);
       },
       async setCover(productId, imageId) {
         await ready;
-        return mode === 'local' ? localSetCover(productId, imageId) : supabaseSetCover(productId, imageId);
+        return localSetCover(productId, imageId);
       },
       async moveImage(productId, imageId, direction) {
         await ready;
-        return mode === 'local' ? localMoveImage(productId, imageId, direction) : supabaseMoveImage(productId, imageId, direction);
+        return localMoveImage(productId, imageId, direction);
       },
       async resetDemo() {
         await ready;
-        return mode === 'local' ? localResetDemo() : supabaseResetDemo();
+        return localResetDemo();
       },
       async getAudit() {
         await ready;
-        return mode === 'local' ? localAuditList() : supabaseGetAudit();
+        return localAuditList();
       },
     },
   };
 
-  window.FerroMaxBackend = backend;
+  window.FerreDemoBackend = backend;
 })();

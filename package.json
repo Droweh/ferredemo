@@ -1,5 +1,5 @@
 {
-  "name": "ferromax-demo",
+  "name": "ferredemo",
   "version": "1.0.0",
   "private": true,
   "description": "Demo de ferretería FerreDemo: tienda, fichas de producto, cuentas y panel de administración.",
@@ -12,7 +12,6 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:security": "node --test \"tests/security/**/*.test.mjs\"",
-    "test:security:rls": "node --test tests/security/rls.integration.test.mjs",
     "test:install": "playwright install chromium"
   },
   "engines": {
@@ -20,7 +19,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
-    "@playwright/test": "1.64.1",
-    "@supabase/supabase-js": "2.118.0"
+    "@playwright/test": "1.64.1"
   }
 }

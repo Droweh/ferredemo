@@ -6,6 +6,7 @@
   <title>Mi cuenta | FerreDemo</title>
   <meta name="description" content="Ingresá a tu cuenta FerreDemo o creá una nueva en segundos.">
   <meta name="theme-color" content="#ff9100">
+  <script src="js/legacy-data.js"></script>
   <script src="js/theme.js"></script>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/auth.css">
@@ -72,12 +73,6 @@
           </div>
 
           <div class="auth-alert" id="auth-alert" role="alert" hidden></div>
-
-          <div class="auth-captcha" id="captcha-wrap" hidden>
-            <p class="auth-captcha__label">Verificación de seguridad</p>
-            <div id="turnstile-container"></div>
-            <p class="form-note" id="captcha-note">Protegido por Cloudflare Turnstile.</p>
-          </div>
 
           <form class="auth-form" id="login-form" aria-labelledby="tab-login" novalidate>
             <div class="field">
@@ -189,7 +184,7 @@
                 <label for="current-password">Contraseña actual</label>
                 <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" required minlength="8">
               </div>
-              <p class="form-note" id="password-note">En la demo local se verifica la contraseña actual. Con Supabase, la sesión activa autoriza el cambio.</p>
+              <p class="form-note" id="password-note">Se verifica la contraseña actual antes de guardar la nueva.</p>
               <div class="field-grid">
                 <div class="field">
                   <label for="new-password">Nueva contraseña</label>
@@ -217,9 +212,6 @@
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
-<script src="js/config.js"></script>
-<script src="js/vendor/supabase.js"></script>
 <script src="js/data.js"></script>
 <script src="js/backend.js"></script>
 <script src="js/auth.js"></script>

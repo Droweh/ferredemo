@@ -4,10 +4,10 @@ import { loginAsAdmin, openAdminProduct, pngFile } from './support/helpers';
 test.describe('Seguridad del navegador', () => {
   test('escapa nombres de producto maliciosos en panel, catálogo y ficha', async ({ page }) => {
     await loginAsAdmin(page);
-    const malicious = '<img src=x onerror="window.__ferromaxXss=1">Producto XSS';
+    const malicious = '<img src=x onerror="window.__ferredemoXss=1">Producto XSS';
 
     await page.evaluate(async (name) => {
-      await window.FerroMaxBackend.admin.saveProduct(null, {
+      await window.FerreDemoBackend.admin.saveProduct(null, {
         code: 'FDXSS1',
         name,
         category: 'herramientas',
@@ -18,7 +18,7 @@ test.describe('Seguridad del navegador', () => {
         oldPrice: 0,
         stock: 1,
         status: 'published',
-        description: '<script>window.__ferromaxXss = 2</script>',
+        description: '<script>window.__ferredemoXss = 2</script>',
       });
     }, malicious);
 
@@ -29,7 +29,7 @@ test.describe('Seguridad del navegador', () => {
     await expect(row).toBeVisible();
     await expect(row.locator('.admin-product__name')).toHaveText(malicious);
     await expect(row.locator('img[src="x"]')).toHaveCount(0);
-    expect(await page.evaluate(() => window.__ferromaxXss)).toBeUndefined();
+    expect(await page.evaluate(() => window.__ferredemoXss)).toBeUndefined();
     const productId = await row.getAttribute('data-product-id');
     expect(productId).toBeTruthy();
 
@@ -39,14 +39,14 @@ test.describe('Seguridad del navegador', () => {
     await expect(card.locator('.product-card__name')).toHaveText(malicious);
     await expect(card.locator('img[src="x"]')).toHaveCount(0);
     await expect(card.locator('script')).toHaveCount(0);
-    expect(await page.evaluate(() => window.__ferromaxXss)).toBeUndefined();
+    expect(await page.evaluate(() => window.__ferredemoXss)).toBeUndefined();
 
     await page.goto(`/producto.html?id=${productId}`);
     await expect(page.locator('#product-name')).toHaveText(malicious);
     await expect(page.locator('#product-description')).toContainText('<script>');
     await expect(page.locator('#product-description script')).toHaveCount(0);
     await expect(page.locator('#product-content img[src="x"]')).toHaveCount(0);
-    expect(await page.evaluate(() => window.__ferromaxXss)).toBeUndefined();
+    expect(await page.evaluate(() => window.__ferredemoXss)).toBeUndefined();
   });
 
   test('rechaza SVG y archivos mayores a 5 MB en la subida de fotos', async ({ page }) => {
@@ -94,10 +94,10 @@ test.describe('Seguridad del navegador', () => {
   test('una sesión expirada no se restaura', async ({ page }) => {
     await loginAsAdmin(page);
     await page.evaluate(() => {
-      const raw = window.localStorage.getItem('ferromax.demo.session.v1');
+      const raw = window.localStorage.getItem('ferredemo.demo.session.v1');
       const session = raw ? JSON.parse(raw) : {};
       window.localStorage.setItem(
-        'ferromax.demo.session.v1',
+        'ferredemo.demo.session.v1',
         JSON.stringify({ ...session, expiresAt: Date.now() - 60_000 })
       );
     });
@@ -106,7 +106,7 @@ test.describe('Seguridad del navegador', () => {
     await expect(page.locator('#auth-view')).toBeVisible();
     await expect(page.locator('#session-chip')).toHaveText('Sin sesión');
     expect(
-      await page.evaluate(() => window.localStorage.getItem('ferromax.demo.session.v1'))
+      await page.evaluate(() => window.localStorage.getItem('ferredemo.demo.session.v1'))
     ).toBeNull();
   });
 

@@ -1,7 +1,7 @@
 /* Datos de demostración de FerreDemo.
    Los textos visibles se escriben en caja normal; la interfaz los pasa a mayúsculas.
    Las fotos son referencias locales de DIT Ferretería para uso exclusivo de la demo. */
-window.FERROMAX = {
+window.FERREDEMO = {
   categories: [
     {
       id: 'ferreteria',

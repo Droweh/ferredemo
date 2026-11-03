@@ -7,7 +7,6 @@ const SKIP_DIRS = new Set([
   'node_modules',
   'playwright-report',
   'test-results',
-  'supabase/.temp',
 ]);
 
 const TEXT_EXTENSIONS = new Set([

@@ -2,8 +2,7 @@
 (() => {
   'use strict';
 
-  const backend = window.FerroMaxBackend;
-  const config = window.FERROMAX_CONFIG || {};
+  const backend = window.FerreDemoBackend;
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -39,30 +38,16 @@
     accountRole: $('#account-role'),
     accountMode: $('#account-mode'),
     accountAccess: $('#account-access'),
-    captchaWrap: $('#captcha-wrap'),
-    captchaNote: $('#captcha-note'),
     demobox: $('#demo-box'),
     toast: $('#toast'),
     registerNote: $('#register-note'),
     title: $('#account-view-title'),
   };
 
-  const isLocal = backend.mode === 'local';
-  const hasTurnstile = !isLocal && Boolean(config.turnstileSiteKey);
-  const status = backend.getSetupStatus ? backend.getSetupStatus() : {};
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  function currentTheme() {
-    if (window.FerroMaxTheme && typeof window.FerroMaxTheme.current === 'function') {
-      return window.FerroMaxTheme.current();
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
 
   let session = null;
   let toastTimer = null;
-  let captchaWidget = null;
-  let turnstilePromise = null;
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (character) => {
@@ -134,37 +119,18 @@
   }
 
   function updateModeUi() {
-    const modeLabel = isLocal ? 'Demo local' : 'Supabase';
     elements.modeTags.forEach((tag) => {
-      if (tag) tag.textContent = modeLabel;
+      if (tag) tag.textContent = 'Demo local';
     });
 
     if (elements.accountMode) {
-      elements.accountMode.textContent = isLocal
-        ? 'Demo local (localStorage + IndexedDB)'
-        : 'Supabase (Auth + Postgres + Storage)';
+      elements.accountMode.textContent = 'Demo local (localStorage + IndexedDB)';
     }
-    if (elements.demobox) elements.demobox.hidden = !isLocal;
-    if (elements.captchaWrap) elements.captchaWrap.hidden = !hasTurnstile;
-
-    const currentPasswordField = $('#current-password-field');
-    const currentPasswordInput = $('#current-password');
-    const passwordNote = $('#password-note');
-    if (currentPasswordField) currentPasswordField.hidden = !isLocal;
-    if (currentPasswordInput) currentPasswordInput.required = isLocal;
-    if (passwordNote && !isLocal) {
-      passwordNote.textContent =
-        'La sesión activa autoriza el cambio. Si no reconocés esta sesión, cerrá sesión y volvé a entrar.';
-    }
+    if (elements.demobox) elements.demobox.hidden = false;
 
     if (elements.registerNote) {
-      elements.registerNote.textContent = isLocal
-        ? 'La cuenta se crea al instante y queda guardada en este navegador. No se envía ningún correo.'
-        : 'La cuenta se crea al instante; la confirmación por email está desactivada en Supabase.';
-    }
-
-    if (status.error) {
-      showAlert(elements.authAlert, status.error, 'error');
+      elements.registerNote.textContent =
+        'La cuenta se crea al instante y queda guardada en este navegador. No se envía ningún correo.';
     }
   }
 
@@ -197,89 +163,6 @@
     if (elements.title) elements.title.textContent = session.isAdmin ? 'Cuenta de administración' : 'Mi cuenta';
   }
 
-  function loadTurnstile() {
-    if (window.turnstile) return Promise.resolve(window.turnstile);
-    if (turnstilePromise) return turnstilePromise;
-
-    turnstilePromise = new Promise((resolve, reject) => {
-      const existing = document.querySelector('script[data-ferromax-turnstile]');
-      const script = existing || document.createElement('script');
-      const onLoad = () => {
-        if (window.turnstile) resolve(window.turnstile);
-        else reject(new Error('Turnstile no se inicializó.'));
-      };
-      script.addEventListener('load', onLoad, { once: true });
-      script.addEventListener(
-        'error',
-        () => reject(new Error('No pudimos cargar Turnstile. Revisá tu conexión.')),
-        { once: true }
-      );
-
-      if (!existing) {
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-        script.async = true;
-        script.defer = true;
-        script.dataset.ferromaxTurnstile = 'true';
-        document.head.appendChild(script);
-      }
-    });
-
-    return turnstilePromise;
-  }
-
-  async function setupTurnstile() {
-    if (!hasTurnstile || captchaWidget !== null) return;
-    const container = $('#turnstile-container');
-    if (!container) return;
-
-    try {
-      await loadTurnstile();
-      captchaWidget = window.turnstile.render(container, {
-        sitekey: config.turnstileSiteKey,
-        theme: currentTheme(),
-        size: 'flexible',
-        appearance: 'always',
-      });
-      if (elements.captchaNote) {
-        elements.captchaNote.textContent = 'Protegido por Cloudflare Turnstile. Sin correos ni verificaciones adicionales.';
-      }
-    } catch (error) {
-      if (elements.captchaWrap) elements.captchaWrap.hidden = true;
-      showAlert(elements.authAlert, error.message, 'error');
-    }
-  }
-
-  function refreshTurnstileTheme() {
-    if (!hasTurnstile || captchaWidget === null || !window.turnstile) return;
-    if (elements.authView && elements.authView.hidden) return;
-    try {
-      window.turnstile.remove(captchaWidget);
-    } catch (error) {
-      // Si el widget ya no existe, continuamos con el siguiente render.
-    }
-    captchaWidget = null;
-    setupTurnstile();
-  }
-
-  function getCaptchaToken() {
-    if (!hasTurnstile) return '';
-    if (!window.turnstile || captchaWidget === null) {
-      throw new Error('La verificación de seguridad todavía no está lista. Esperá un segundo y reintentá.');
-    }
-    const token = window.turnstile.getResponse(captchaWidget);
-    if (!token) throw new Error('Completá la verificación de seguridad para continuar.');
-    return token;
-  }
-
-  function resetCaptcha() {
-    if (!hasTurnstile || !window.turnstile || captchaWidget === null) return;
-    try {
-      window.turnstile.reset(captchaWidget);
-    } catch (error) {
-      // Si el widget ya no existe, no bloqueamos el formulario.
-    }
-  }
-
   function validateEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
   }
@@ -298,24 +181,15 @@
       return;
     }
 
-    let captchaToken;
-    try {
-      captchaToken = getCaptchaToken();
-    } catch (error) {
-      showAlert(elements.authAlert, error.message, 'error');
-      return;
-    }
-
     setBusy(form, true);
     try {
-      const user = await backend.signIn({ email, password, captchaToken });
+      const user = await backend.signIn({ email, password });
       if (!user) throw new Error('No pudimos iniciar la sesión. Reintentá.');
       renderSession(user);
       form.reset();
       showToast('Sesión iniciada');
     } catch (error) {
       showAlert(elements.authAlert, error.message, 'error');
-      resetCaptcha();
     } finally {
       setBusy(form, false);
     }
@@ -354,24 +228,15 @@
       return;
     }
 
-    let captchaToken;
-    try {
-      captchaToken = getCaptchaToken();
-    } catch (error) {
-      showAlert(elements.authAlert, error.message, 'error');
-      return;
-    }
-
     setBusy(form, true);
     try {
-      const user = await backend.signUp({ name, email, password, captchaToken });
+      const user = await backend.signUp({ name, email, password });
       if (!user) throw new Error('No pudimos crear la cuenta. Reintentá.');
       renderSession(user);
       form.reset();
       showToast('Cuenta creada. Ya estás dentro.');
     } catch (error) {
       showAlert(elements.authAlert, error.message, 'error');
-      resetCaptcha();
     } finally {
       setBusy(form, false);
     }
@@ -396,7 +261,7 @@
       showAlert(elements.passwordAlert, 'Las contraseñas nuevas no coinciden.', 'error');
       return;
     }
-    if (!isLocal && password === currentPassword) {
+    if (password === currentPassword) {
       showAlert(elements.passwordAlert, 'La nueva contraseña tiene que ser distinta de la actual.', 'error');
       return;
     }
@@ -422,8 +287,6 @@
       await backend.signOut();
       renderSession(null);
       switchTab('login');
-      resetCaptcha();
-      await setupTurnstile();
       showToast('Sesión cerrada');
     } catch (error) {
       showToast(error.message);
@@ -495,19 +358,9 @@
     if (hash === 'registro') switchTab('register', false);
     else switchTab('login', false);
 
-    if (status.error) {
-      renderSession(null);
-      return;
-    }
-
     try {
       const user = await backend.getSession();
       renderSession(user);
-      if (!user) await setupTurnstile();
-      else if (elements.sessionChip) {
-        const alert = elements.accountAlert;
-        if (alert) hideAlert(alert);
-      }
     } catch (error) {
       renderSession(null);
       showAlert(elements.authAlert, error.message, 'error');
@@ -519,13 +372,8 @@
       } else if (session) {
         renderSession(null);
         switchTab('login');
-        resetCaptcha();
       }
     });
-
-    if (window.FerroMaxTheme && typeof window.FerroMaxTheme.subscribe === 'function') {
-      window.FerroMaxTheme.subscribe(() => refreshTurnstileTheme());
-    }
   }
 
   init();

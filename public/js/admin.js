@@ -3,13 +3,13 @@
 (() => {
   'use strict';
 
-  const backend = window.FerroMaxBackend;
-  const data = window.FERROMAX;
+  const backend = window.FerreDemoBackend;
+  const data = window.FERREDEMO;
 
   if (!backend || !data) {
     document.addEventListener('DOMContentLoaded', () => {
       const box = document.querySelector('#admin-loading');
-      if (box) box.innerHTML = '<h1 class="admin-gate__title">No pudimos iniciar el panel</h1><p class="admin-gate__text">Revisá los archivos js/config.js y js/backend.js.</p>';
+      if (box) box.innerHTML = '<h1 class="admin-gate__title">No pudimos iniciar el panel</h1><p class="admin-gate__text">Revisá los archivos js/data.js y js/backend.js.</p>';
     });
     return;
   }
@@ -19,8 +19,6 @@
   const categories = data.categories;
   const categoryById = new Map(categories.map((category) => [category.id, category]));
   const maxImages = backend.maxImages || 5;
-  const isLocal = backend.mode === 'local';
-  const status = backend.getSetupStatus ? backend.getSetupStatus() : {};
 
   const elements = {
     loading: $('#admin-loading'),
@@ -215,15 +213,12 @@
   }
 
   function updateModeUi() {
-    const modeLabel = isLocal ? 'Demo local' : 'Supabase';
-    if (elements.adminMode) elements.adminMode.textContent = modeLabel;
+    if (elements.adminMode) elements.adminMode.textContent = 'Demo local';
     if (elements.adminModeDetail) {
-      elements.adminModeDetail.textContent = isLocal
-        ? 'Demo local · datos en este navegador'
-        : 'Supabase · catálogo en línea';
+      elements.adminModeDetail.textContent = 'Demo local · datos en este navegador';
     }
-    if (elements.localNote) elements.localNote.hidden = !isLocal;
-    if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = !isLocal;
+    if (elements.localNote) elements.localNote.hidden = false;
+    if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = false;
 
     if (elements.adminDate) {
       const text = new Intl.DateTimeFormat('es-UY', {
@@ -258,27 +253,23 @@
       elements.gateText.textContent = 'El panel solo está disponible para la cuenta administradora de FerreDemo.';
       elements.gateLogin.href = 'cuenta.html#ingresar';
       elements.gateLogin.textContent = 'Iniciar sesión';
-      elements.gateNote.textContent = isLocal
-        ? 'Demo local: admin@ferredemo.com / Admin1234!'
-        : 'Ingresá con la cuenta que tiene el rol admin en app_metadata.';
-      if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = !isLocal;
+      elements.gateNote.textContent = 'Demo local: admin@ferredemo.com / Admin1234!';
+      if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = false;
     } else if (kind === 'denied') {
       elements.gateKicker.textContent = 'Permisos insuficientes';
       elements.gateTitle.textContent = 'Esta cuenta no es administradora';
       elements.gateText.textContent = 'Cerrá sesión desde Mi cuenta y volvé a entrar con la cuenta de administración.';
       elements.gateLogin.href = 'cuenta.html';
       elements.gateLogin.textContent = 'Ir a mi cuenta';
-      elements.gateNote.textContent = isLocal
-        ? 'Usá “Entrar como admin demo” o las credenciales admin@ferredemo.com / Admin1234!'
-        : 'El rol se asigna en Supabase (app_metadata). Cerrá sesión y volvé a entrar después de asignarlo.';
-      if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = !isLocal;
+      elements.gateNote.textContent = 'Usá “Entrar como admin demo” o las credenciales admin@ferredemo.com / Admin1234!';
+      if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = false;
     } else {
       elements.gateKicker.textContent = 'Panel / Error';
       elements.gateTitle.textContent = 'No pudimos abrir el panel';
-      elements.gateText.textContent = kind || 'Revisá la configuración de Supabase y volvé a intentar.';
+      elements.gateText.textContent = kind || 'Recargá la página y volvé a intentar.';
       elements.gateLogin.href = 'admin.html';
       elements.gateLogin.textContent = 'Reintentar';
-      elements.gateNote.textContent = 'Si el proyecto estuvo pausado, esperá unos segundos y recargá.';
+      elements.gateNote.textContent = 'Recargá la página en unos segundos.';
       if (elements.gateDemoLogin) elements.gateDemoLogin.hidden = true;
     }
   }
@@ -294,11 +285,6 @@
     if (elements.loading) elements.loading.hidden = false;
     if (elements.gate) elements.gate.hidden = true;
     if (elements.shell) elements.shell.hidden = true;
-
-    if (status.error) {
-      showGate(status.error);
-      return;
-    }
 
     let user = null;
     try {

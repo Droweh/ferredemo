@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'ferromax.theme.v1';
+  var STORAGE_KEY = 'ferredemo.theme.v1';
   var root = document.documentElement;
   var media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   var listeners = new Set();
@@ -55,7 +55,7 @@
     });
     try {
       document.dispatchEvent(
-        new CustomEvent('ferromax:themechange', {
+        new CustomEvent('ferredemo:themechange', {
           detail: { theme: theme, source: source },
         })
       );
@@ -125,7 +125,7 @@
     bindControls();
   }
 
-  window.FerroMaxTheme = {
+  window.FerreDemoTheme = {
     key: STORAGE_KEY,
     current: current,
     set: set,
