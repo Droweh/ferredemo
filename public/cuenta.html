@@ -74,6 +74,22 @@
 
           <div class="auth-alert" id="auth-alert" role="alert" hidden></div>
 
+          <div class="demo-box" id="demo-box">
+            <div class="demo-box__head">
+              <span class="demo-box__title">Credenciales de demostración</span>
+              <span class="mode-tag mode-tag--dark">Solo local</span>
+            </div>
+            <div class="demo-box__row">
+              <code>admin@ferredemo.com</code><code>Admin1234!</code>
+              <button class="demo-use" type="button" data-demo="admin">Usar admin</button>
+            </div>
+            <div class="demo-box__row">
+              <code>cliente@ferredemo.com</code><code>Cliente1234!</code>
+              <button class="demo-use" type="button" data-demo="client">Usar cliente</button>
+            </div>
+            <p>Los datos del panel se guardan en este navegador. La papelera y el reset están disponibles para el admin.</p>
+          </div>
+
           <form class="auth-form" id="login-form" aria-labelledby="tab-login" novalidate>
             <div class="field">
               <label for="login-email">Email</label>
@@ -119,22 +135,6 @@
             <button class="btn btn--accent btn--full auth-submit" type="submit">Crear cuenta</button>
             <p class="form-note" id="register-note">La cuenta se crea al instante, sin verificación por email.</p>
           </form>
-
-          <div class="demo-box" id="demo-box" hidden>
-            <div class="demo-box__head">
-              <span class="demo-box__title">Credenciales de demostración</span>
-              <span class="mode-tag mode-tag--dark">Solo local</span>
-            </div>
-            <div class="demo-box__row">
-              <code>admin@ferredemo.com</code><code>Admin1234!</code>
-              <button class="demo-use" type="button" data-demo="admin">Usar admin</button>
-            </div>
-            <div class="demo-box__row">
-              <code>cliente@ferredemo.com</code><code>Cliente1234!</code>
-              <button class="demo-use" type="button" data-demo="client">Usar cliente</button>
-            </div>
-            <p>Los datos del panel se guardan en este navegador. La papelera y el reset están disponibles para el admin.</p>
-          </div>
 
           <p class="auth-switch">¿No tenés cuenta? <button type="button" data-auth-tab-link="register">Creala ahora</button></p>
         </div>

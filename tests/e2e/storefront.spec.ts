@@ -6,6 +6,11 @@ test.describe('Portada y catálogo', () => {
 
     await expect(page.locator('#tiles .category-tile')).toHaveCount(9);
     await expect(page.locator('#menu .category-nav__link')).toHaveCount(9);
+    const maquinas = page.locator('#tiles .category-tile', { hasText: 'Máquinas' });
+    await expect(maquinas).toContainText('14 productos');
+    await expect(
+      page.locator('#tiles .category-tile', { hasText: 'Ferretería' })
+    ).toContainText('2 productos');
     await expect(page.locator('#grid-combos .product-card')).toHaveCount(8);
     await expect(page.locator('#grid-nuevos .product-card')).toHaveCount(6);
     await expect(

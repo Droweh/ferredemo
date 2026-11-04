@@ -4,6 +4,9 @@ import { ADMIN, CLIENT, loginWithCredentials, signOutFromAccount } from './suppo
 test.describe('Acceso y cuentas', () => {
   test('el admin entra, ve su rol y el botón Panel', async ({ page }) => {
     await page.goto('/cuenta.html#ingresar');
+    await expect(page.locator('#demo-box')).toBeVisible();
+    await expect(page.locator('#demo-box')).toContainText(ADMIN.email);
+    await expect(page.locator('#demo-box')).toContainText(ADMIN.password);
     await page.getByRole('button', { name: 'Usar admin' }).click();
     await expect(page.locator('#login-email')).toHaveValue(ADMIN.email);
     await expect(page.locator('#login-password')).toHaveValue(ADMIN.password);
@@ -18,6 +21,16 @@ test.describe('Acceso y cuentas', () => {
     await page.goto('/');
     await expect(page.locator('#admin-link')).toBeVisible();
     await expect(page.locator('[data-action="login"] .action-btn__label')).toHaveText('Admin');
+  });
+
+  test('las credenciales demo se ven aunque backend.js no cargue', async ({ page }) => {
+    await page.route('**/js/backend.js', (route) => route.abort());
+    await page.goto('/cuenta.html#ingresar');
+
+    await expect(page.locator('#demo-box')).toBeVisible();
+    await expect(page.locator('#demo-box')).toContainText(ADMIN.email);
+    await expect(page.locator('#demo-box')).toContainText(CLIENT.email);
+    await expect(page.locator('#auth-alert')).toContainText('No pudimos cargar la conexión de datos');
   });
 
   test('un cliente entra pero no ve el panel', async ({ page }) => {

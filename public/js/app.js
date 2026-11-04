@@ -31,6 +31,7 @@
     cart: new Map(),
     favorites: new Set(),
     products: [],
+    catalogLoaded: false,
     session: null,
   };
 
@@ -191,14 +192,17 @@
     if (!tiles) return;
 
     tiles.innerHTML = categories
-      .map(
-        (category, index) => `
+      .map((category) => {
+        const count = state.products.filter((product) => product.category === category.id).length;
+        const countLabel = state.catalogLoaded ? pluralize(count, 'producto', 'productos') : '';
+        const name = escapeHtml(category.name);
+        return `
           <a class="category-tile" href="${categoryHref(category)}">
-            <span class="category-tile__index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
             ${icon(category.icon, 'category-tile__icon')}
-            <span class="category-tile__name">${escapeHtml(category.name)}</span>
-          </a>`
-      )
+            <span class="category-tile__name">${name}</span>
+            <span class="category-tile__count">${countLabel}</span>
+          </a>`;
+      })
       .join('');
   }
 
@@ -1429,7 +1433,9 @@
       const result = await backend.getCatalog();
       state.products = Array.isArray(result.products) ? result.products : data.products;
       productById = new Map(state.products.map((product) => [Number(product.id), product]));
+      state.catalogLoaded = true;
       hydrateState();
+      renderCategoryTiles();
     } catch (error) {
       console.error(error);
       showLoadError(error);
